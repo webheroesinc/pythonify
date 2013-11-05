@@ -142,33 +142,49 @@ console.log("Ready");
             }
         }
     });
-
+    
+    function _in(iterable) {
+        if( is_dict(iterable) ) {
+            return iterable[this] !== undefined
+                ? true : false;
+        }
+        else if( is_list(iterable) ) {
+            var v = this.anchor !== undefined ? this.toString() : parseInt(this.toString())
+            return iterable.indexOf(v) !== -1
+                ? true : false;
+        }
+    }
+    function _notIn(iterable) {
+        if( is_dict(iterable) ) {
+            return iterable[this] === undefined
+                ? true : false;
+        }
+        else if( is_list(iterable) ) {
+            var v = this.anchor !== undefined ? this.toString() : parseInt(this.toString())
+            return iterable.indexOf(v) === -1
+                ? true : false;
+        }
+    }
+    
     Object.defineProperties( String.prototype, {
         "in": {
             writable: true,
-            value: function(iterable) {
-                if( is_dict(iterable) ) {
-                    return iterable[this] !== undefined
-                        ? true : false;
-                }
-                else if( is_list(iterable) ) {
-                    return iterable.indexOf(this.toString()) !== -1
-                        ? true : false;
-                }
-            }
+            value: _in
         },
         "notIn": {
             writable: true,
-            value: function(iterable) {
-                if( is_dict(iterable) ) {
-                    return iterable[this] === undefined
-                        ? true : false;
-                }
-                else if( is_list(iterable) ) {
-                    return iterable.indexOf(this.toString()) === -1
-                        ? true : false;
-                }
-            }
+            value: _notIn
+        }
+    });
+    
+    Object.defineProperties( Number.prototype, {
+        "in": {
+            writable: true,
+            value: _in
+        },
+        "notIn": {
+            writable: true,
+            value: _notIn
         }
     });
     
@@ -299,6 +315,14 @@ console.log("Ready");
     assert( ! "nothing".in(d) )
     assert( ! "plc".notIn(d) )
     assert( "nothing".notIn(d) )
+
+    // test number.in() and number.notIn() for dict
+    a = 1
+    b = 2
+    assert( a.in([1]) )
+    assert( ! b.in([1]) )
+    assert( ! a.notIn([1]) )
+    assert( b.notIn([1]) )
     
     // test dict.get()
     assert( d.get('plc', null) === "xxplc1" )
@@ -362,6 +386,14 @@ console.log("Ready");
     assert( ! "plc".in(l) )
     assert( ! "single".notIn(l) )
     assert( "plc".notIn(l) )
+
+    // test number.in() and number.notIn() for list
+    a = 1
+    b = 2
+    assert( a.in([1]) )
+    assert( ! b.in([1]) )
+    assert( ! a.notIn([1]) )
+    assert( b.notIn([1]) )
 
     // test list.extend()
     l.extend(['your','mom'])
