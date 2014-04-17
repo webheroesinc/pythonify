@@ -23,19 +23,37 @@
         }
         assert( error.startswith(expected) === true );
     }
+    
+    // Test important funtions
+
+    // test dict.keys()
+    var d	= { a:1, b:2 }
+    var ik	= {1: 'D', 2: 'B', 3: 'B', 4: 'E', 5: 'A'};
+    assert( len(d.keys()) == 2 )
+    assert( d.keys()[0] == "a" )
+    assert( d.keys()[1] == "b" )
+    assert( ik.keys()[0] === "1" ) // All dict keys are technically strings in javascript
 
     // Testing general functions
+
+    // test is_complex()
+    assert( is_complex({}) === true )
+    assert( is_complex([]) === true )
+    assert( is_complex("") === false )
+    assert( is_complex(89) === false )
 
     // test is_dict()
     assert( is_dict({ 'text': 'hello' }) === true )
     assert( is_dict(window) === true )
     assert( is_dict([1, 2]) === false )
     assert( is_dict("string") === false )
-    assert( is_dict(23) === false )
+    assert( is_dict(23) === false );
+    (function() { assert( is_dict(arguments) === false ) })()
 
     // test len() for list and dict
     assert( len(['hello','world']) === 2 )
-    assert( len({ 'text': 'hello', 'value': 'world' }) === 2 )
+    assert( len({ 'text': 'hello', 'value': 'world' }) === 2 );
+    (function() { assert( len(arguments) === 2 ) })(1,2)
 
     // test abs()
     assert( abs(-2) === 2 )
@@ -144,10 +162,19 @@
     assert( hex(1) === "0x1" )
     
     // test id()
-    var d = {};
-    var d2 = {};
-    assert( id(d) === d.id() )
+    var d	= {};
+    var d2	= {};
+    var l	= [];
+    var l2	= [];
+    var s	= "smile";
+    var num	= 4;
+    assert( id(d) === d.__id__() )
+    assert( id(d) === id(d) )
+    assert( id(l) === id(l) )
     assert( id(d) != id(d2) )
+    assert( id(l) != id(l2) )
+    assert( id(s) !== id(s) )
+    assert( id(num) !== id(num) )
 
     // test int()
     assert( int() === 0 )
@@ -195,6 +222,17 @@
     assert( len( iter([1,2,3,4]) ) === 4 )
     assert( len( iter({ a: 1, b: 1 }) ) === 2 )
 
+    // test map()
+    var ml	= map( function(x) { return x+4 }, [3,7,5,3,8,67] );
+    assert( ml[0] === 7 )
+    assert( ml[5] === 71 )
+    var mml	= map( function(x,y) { return x+y }, [1,2,3], [1,2] );
+    assert( mml[0] === 2 )
+    assert( isNaN( mml[2] ) )
+    var mmm	= map( function(x,y) { return x+y }, { "a": 4, "b": 1, "z": 0 }, ["c","d"] );
+    assert( mmm[0] === "ac" )
+    assert( mmm[2] === "zundefined" )
+
     // test max()
     var d	= { "a": 4, "b": 1, "z": 0 };
     assert( max([3,7,5,3,8,67]) === 67 )
@@ -233,8 +271,95 @@
     assert( len(range(0,8,2)) === 4 )
     assert( len(range(0,-10,-1)) === 10 )
     assert( len(range(0,10,-1)) === 0 )
-    catch_error( function() { len(range(0,10,0)) === 0 }, "ValueError: range() step argument must not be zero" )
+    catch_error( function() { range(0,10,0) }, "ValueError: range() step argument must not be zero" )
 
+    // test reduce()
+    assert( reduce(function(x,y) { return x+y }, [1,2,3,4,5]) === 15 )
+    assert( reduce(function(x,y) { return x+y }, [1,2,3,4,5], 10) === 25 )
+    assert( reduce(function(x,y) { return x+y }, [], 10) === 10 )
+    catch_error( function() { reduce(function(x,y) { return x+y }, []) }, "reduce() of empty sequence with no initial value" )
+    assert( reduce(function(x,y) { return x+y }, {a:1,b:2}, 10) === "10ab" )
+
+    // test repr()
+    assert( repr({a:1,b:2}) == '{"a":1,"b":2}' )
+    assert( repr([1,2,3,4,5]) == '[1,2,3,4,5]' )
+
+    // test reversed()
+    assert( reversed([1,2,3,4])[0] === 4 )
+    assert( reversed([1,2,3,4])[3] === 1 )
+    catch_error( function() { reversed({a:1,b:2}) }, "TypeError: argument to reversed() must be a sequence" )
+
+    // test round()
+    assert( round(1648.2945) === 1648 )
+    assert( round(1648.2945, -1) === 1650 )
+    assert( round(1648.2945, 2) === 1648.29 )
+
+    // test setattr()
+    var d = {};
+    setattr(d, 'smile', 2)
+    assert( d.smile === 2 )
+
+    // test sorted()
+    var d	= {1: 'D', 2: 'B', 3: 'B', 4: 'E', 5: 'A'};
+    var ds	= sorted( d );
+    assert( ds[0] === '1' )
+    assert( ds[4] === '5' )
+    var dsr	= sorted( d, undefined, undefined, true );
+    assert( dsr[0] === '5' )
+    assert( dsr[4] === '1' )
+    var dks	= sorted( d, undefined, function(x) { return d[x] } );
+    assert( dks[0] === '5' )
+    assert( dks[4] === '4' )
+    var dksr	= sorted( d, undefined, function(x) { return d[x] }, true );
+    assert( dksr[0] === '4' )
+    assert( dksr[1] === '1' )
+    assert( dksr[2] === '2' )
+    assert( dksr[3] === '3' )
+    assert( dksr[4] === '5' )
+    var lts	= sorted( [ ['john', 'A', 15], ['jane', 'B', 12], ['dave', 'B', 10] ] );
+    assert( lts[0][0] === "dave" )
+    assert( lts[0][2] === 10 )
+    assert( lts[2][0] === "john" )
+    assert( lts[2][2] === 15 )
+    var lts	= sorted( [ ['john', 'A', 15], ['jane', 'B', 12], ['dave', 'B', 10] ],
+                          undefined, function(x) { return x[1] } );
+    assert( lts[0][0] === "john" )
+    assert( lts[1][0] === "jane" )
+    assert( lts[2][0] === "dave" )
+    var lts	= sorted( [ ['john', 'A', 15], ['jane', 'B', 12], ['dave', 'B', 10] ],
+                          undefined, function(x) { return x[1] }, true );
+    assert( lts[0][0] === "jane" )
+    assert( lts[1][0] === "dave" )
+    assert( lts[2][0] === "john" )
+
+    // test str()
+    assert( str({a:1,b:2}) == '{"a":1,"b":2}' )
+    assert( str([1,2,3,4,5]) == '[1,2,3,4,5]' )
+
+    // test sum()
+    assert( sum([1,2,3,4]) == 10 )
+    assert( sum([1,2,3,4], 5) == 15 )
+    assert( sum([1,2.5,3.5,4], 5) == 16 )
+    catch_error( function() { sum(["a","b"]) }, "TypeError: sum() can only handle numbers" )
+    catch_error( function() { sum([[],{}]) }, "TypeError: sum() can only handle numbers" )
+    catch_error( function() { sum([], "a") }, "TypeError: start argument can only be an number" )
+
+    // test type()
+    assert( type([]) == "Array" )
+    assert( type({}) == "Object" )
+    assert( type(tuple([])) == "Tuple" )
+    assert( type("") == "String" )
+    assert( type(3) == "Number" )
+    assert( type(/1/) == "RegExp" )
+
+    // test type()
+    assert( len( zip() ) == 0 )
+    assert( len( zip([1], [1,2]) ) == 1 )
+    p1	= [{}, [], 1];
+    p2	= ["12", [1,2,{}], null];
+    z1	= zip(p1, p2);
+    assert( len( z1 ) == 3 )
+    
 
 
     // Testing dict
@@ -266,9 +391,6 @@
     assert( d.get('nothing', 1) === 1 )
     assert( d.get('nothing') === null )
     assert( len(d) === 2 )
-
-    // test dict.keys()
-    assert( len(d.keys()) == 2 )
 
     // test dict.values()
     assert( len(d.values()) == 2 )
@@ -333,7 +455,10 @@
     // test list.append()
     l.append("girls")
     assert( len(l) === 2 )
-
+    var l2	= []
+    l2.append([1,2,3])
+    assert( len(l2) === 1 )
+    
     // test string.in() and string.notIn() for list
     assert( "single".in(l) )
     assert( ! "plc".in(l) )
@@ -349,9 +474,18 @@
     assert( b.notIn([1]) )
 
     // test list.extend()
+    var l2	= []
     l.extend(['your','mom'])
     assert( len(l) == 4 )
     assert( l[2] == 'your' )
+    l2.extend([ 99, 100, [1,2,3] ])
+    assert( l2[0] === 99 )
+    assert( l2[2][1] === 2 )
+    e	= []
+    e2	= ['my', 'mom', 'said']
+    id( e2 )
+    e.extend(e2)
+    assert( len(e) === 3 )
 
     // test list.insert()
     l.insert(0, 'hot')

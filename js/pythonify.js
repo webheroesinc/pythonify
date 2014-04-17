@@ -14,7 +14,14 @@
         return x;
     }
 
+    window.is_complex = function(obj) {
+        return is_dict(obj) || is_list(obj) ? true : false;
+    }
+
     window.is_dict = function(obj) {
+        if( obj.callee !== undefined ) {
+            return false;
+        }
         if( obj.constructor.name == 'Object' || obj.constructor.name == 'Window' ) {
             return true
         }
@@ -37,13 +44,15 @@
 
     function len( iter ) {
         var length = 0;
-        if( iter instanceof Array ) {
-            length	= iter.length
-        }
-        else if( iter instanceof Object ) {
-            for( key in iter ) {
+        if( is_complex(iter) ) {
+            var keys	= iter.keys();
+            for( var i in keys ) {
+                var key	= keys[i];
                 if (iter.hasOwnProperty(key)) length++;
             }
+        }
+        else if( iter.length ) {
+            return iter.length;
         }
         return length;
     }
@@ -72,7 +81,7 @@
             var d	= {};
             var iter	= arguments[0];
             var keys	= Object.keys(iter);
-            for( i in keys ) {
+            for( var i in keys ) {
                 var k	= keys[i];
                 d[k]	= iter[k];
             }
@@ -80,7 +89,7 @@
         }
         else {
             var d = {};
-            for( i in arguments ) {
+            for( var i in arguments ) {
                 if( arguments[i].length == 2 ) {
                     d[arguments[i][0]] = arguments[i][1];
                 }
@@ -94,7 +103,7 @@
     dict.fromkeys = function( seq, value ) {
         var a	= {}
         , v	= value ? value : null;
-        for( i in seq ) {
+        for( var i in seq ) {
             a[seq[i]] = value
         }
         return a
@@ -105,7 +114,7 @@
         return Math.abs(x);
     }
     window.all = function(iter) {
-        for( i in iter ) {
+        for( var i in iter ) {
             if( ! iter[i] ) {
                 return false;
             }
@@ -113,7 +122,7 @@
         return true;
     }
     window.any = function(iter) {
-        for( i in iter ) {
+        for( var i in iter ) {
             if( iter[i] ) {
                 return true;
             }
@@ -214,8 +223,9 @@
     window.hex = function(n) {
         return (n < 0 ? "-" : "") + "0x"+abs(n).toString(16);
     }
+    // This isn't working as nicely as I could like.
     window.id = function(obj) {
-        return obj.id();
+        return obj.__id__();
     }
     window.input = function(text) {
         return eval(prompt(text));
@@ -250,8 +260,30 @@
     }
     // window.locals:	??? would be the same as globals
     // window.long:	??? would be the same as int
-    window.map = function(callback, iter) {
-        
+    window.map = function(callback) {
+        if( len(arguments) < 2 ) {
+            throw "TypeError: map() takes at least two arguments ("+arguments.length+" given)";
+        }
+        var iterlist	= [];
+        for( var i=1; i < arguments.length; i++ ) {
+            var arg	= arguments[i];
+            iterlist.append( is_dict(arg) ? arg.keys() : new Array().slice.apply(arg) );
+        }
+        var exhausted	= false;
+        var result	= [];
+        while( exhausted === false ) {
+            exhausted	= true;
+            var cb_args	= [];
+            for( var i in iterlist ) {
+                var arg		= iterlist[i].pop();
+                cb_args.append( arg );
+                if( arg !== undefined )
+                    exhausted	= false;
+            }
+            if( exhausted === false )
+                result.append( callback.apply(null, cb_args) );
+        }
+        return result;
     }
     window.max = function() {
         var key		= undefined;
@@ -349,7 +381,119 @@
         return r;
     }
     // window.print:	??? What to do for print?
+    window.reduce = function(callback, iter, initializer) {
+        if( len(iter) === 0 && initializer === undefined ) {
+            throw "reduce() of empty sequence with no initial value";
+        }
+        var sequence	= is_dict( iter ) ? iter.keys() : iter.copy();
+        var accum_value	= initializer === undefined ? sequence.pop() : initializer;
+        for( var i in sequence ) {
+            var x	= sequence[i];
+            accum_value = callback( accum_value, x );
+        }
+        return accum_value;
+    }
+    // window.reload:	No concept for modules yet
+    window.repr = function(obj) {
+        return obj.__repr__ === undefined ? obj.toString() : obj.__repr__();
+    }
+    window.reversed = function(iter) {
+        if( iter.__reversed__ === undefined ) {
+            throw "TypeError: argument to reversed() must be a sequence";
+        }
+        return iter.__reversed__();
+    }
+    window.round = function(n, ndigits) {
+        var modifier	= pow(10, ndigits === undefined ? 0 : ndigits );
+        return Math.round(n*modifier)/modifier;
+    }
+    // window.set:	Later...
+    window.setattr = function(obj, name, value) {
+        if( arguments.length !== 3 ) {
+            throw "TypeError: setattr() takes exactly three arguments ("+arguments.length+" given)";
+        }
+        obj[name] = value;
+    }
+    // window.slice:	Seems kinda useless, look into some examples
+    window.sorted = function(iter, cmp, key, reverse) {
+        if( arguments.length === 0 ) {
+            throw "TypeError: sorted() takes at least one argument (0 given)";
+        }
+        // keys is the list we want to return at the end but in the right order
+        // if key is defined: sort list of keys made by key function otherwise sort this list directly
+        var keys	= is_dict( iter ) ? iter.keys() : iter.copy();
+        var sequence	= key === undefined ? keys : map( key, keys );
+        var seqkeymap	= {};
+        for( var i in sequence ) {
+            var v	= sequence[i];
+            var sid	= is_complex(v) ? id( v ) : v;
+            var b	= seqkeymap.setdefault(sid, []);
+            b.append(keys[i])
+            var c	= seqkeymap.setdefault(sid, []);
+        }
+        if( cmp === undefined ) {
+            sortedseq	= reverse === true ? sequence.sort().reverse() : sequence.sort();
+        }
+        else {
+            sortedseq	= sequence.sort( function(x,y) { return reverse === true ? -cmp(x,y) : cmp(x,y) } );
+        }
+        var result	= [];
+        for( var i in sortedseq ) {
+            var v	= sortedseq[i];
+            var sid	= is_complex(v) ? id( v ) : v;
+            var t	= seqkeymap[sid];
+            var l	= seqkeymap.pop(sid);
+            result.extend( l || [] );
+        }
+        return result;
+    }
+    window.str = function(obj) {
+        if( obj === undefined )
+            return '';
+        return obj.__str__ === undefined ? obj.toString() : obj.__str__();
+    }
+    window.sum = function(iter, start) {
+        if( arguments.length === 0 )
+            throw "TypeError: sum() takes at least one argument (0 given)";
+        if( arguments.length > 2 )
+            throw "TypeError: sum() takes at most two argument ("+arguments.length+" given)";
+        if( start !== undefined && typeof start !== "number" )
+            throw "TypeError: start argument can only be an number";
 
+        var sequence	= is_dict(iter) ? iter.keys() : iter.copy();
+        var total	= reduce(function(x,y) { return x+y }, sequence, start);
+
+        if( typeof total == "string" )
+            throw "TypeError: sum() can only handle numbers";
+
+        return total;
+    }
+    window.type = function(obj) {
+        if( obj === undefined )
+            throw "TypeError: type() takes exactly one argument ("+arguments.length+" given)";
+        if( is_list(obj) && Object.isFrozen(obj) ) {
+            return "Tuple";
+        }
+        return obj.constructor.name;
+    }
+    // window.unichr	Not implementing unicode things
+    // window.unicode	Not implementing unicode things
+    // window.vars	Later...
+    // window.xrange	Later...
+    window.zip = function() {
+        var ziplist	= [];
+        var minlen	= min( map( function(x) { return len(x) }, arguments ) );
+        for( var a=0; a < minlen; a++ ) {
+            var args	= [];
+            for( var i=0; i < arguments.length; i++ ) {
+                var arg	= arguments[i];
+                args.append( arg );
+            }
+            ziplist.append( tuple(args) );
+        }
+        return ziplist;
+    }
+    
 
     
     Object.defineProperties( Array.prototype, {
@@ -360,8 +504,10 @@
         "extend": {
             writable: true,
             value: function(arr) {
-                for( i in arr ) {
-                    this.append(arr[i])
+                var keys	= arr.keys();
+                for( var i in keys ) {
+                    var k	= keys[i];
+                    this.append(arr[k])
                 }
             }
         },
@@ -398,7 +544,7 @@
             writable: true,
             value: function(value) {
                 var c = 0
-                for( i in this ) {
+                for( var i in this ) {
                     this[i] === value ? c++ : null;
                 }
                 return c
@@ -408,6 +554,12 @@
             writable: true,
             value: function() {
                 return this.slice();
+            }
+        },
+        "__reversed__": {
+            writable: true,
+            value: function() {
+                return this.reverse();
             }
         }
     });
@@ -505,7 +657,7 @@
             value: function(suffix, start, end) {
                 var str		= this.slice(start, end)
                 , needles	= typeof suffix == 'string' ? [suffix] : suffix;
-                for( i in needles ) {
+                for( var i in needles ) {
                     var n	= needles[i];
                     if( n.length > str.length ) {
                         continue;
@@ -530,7 +682,7 @@
                 var results	= [];
                 var tabsize	= tabsize === undefined ? 8 : tabsize;
                 var lines	= this.split("\n");
-                for( n in lines ) {
+                for( var n in lines ) {
                     var line	= lines[n];
                     while( line.find("\t") != -1 ) {
                         var i	= line.find("\t");
@@ -554,7 +706,7 @@
                 for( var i=0; i < arguments.length; i++ ) {
                     var arg	= arguments[i];
                     if( is_dict(arg) ) {
-                        for( k in arg ) {
+                        for( var k in arg ) {
                             var re	= new RegExp( RegExp.escape("{"+k+"}") );
                             str		= str.replace(re, arg[k]);
                         }
@@ -641,7 +793,7 @@
             }
         },
         "partition": {
-            writable: false,
+            writable: true,
             value: function( sep ) {
                 if( sep === undefined ) {
                     throw "TypeError: partition() takes exactly one argument ("+arguments.length+" given)";
@@ -653,7 +805,7 @@
             }
         },
         "_replace": {
-            writable: false,
+            writable: true,
             value: String.prototype.replace
         },
         "replace": {
@@ -690,7 +842,7 @@
             }
         },
         "rpartition": {
-            writable: false,
+            writable: true,
             value: function( sep ) {
                 if( sep === undefined ) {
                     throw "TypeError: partition() takes exactly one argument ("+arguments.length+" given)";
@@ -733,7 +885,7 @@
             value: function( keepends ) {
                 var splits	= this._split("\n");
                 if( keepends === true ) {
-                    for( i in splits ) {
+                    for( var i in splits ) {
                         splits[i]      += "\n"
                     }
                 }
@@ -745,7 +897,7 @@
             value: function(suffix, start, end) {
                 var str		= this.slice(start, end)
                 , needles	= typeof suffix == 'string' ? [suffix] : suffix;
-                for( i in needles ) {
+                for( var i in needles ) {
                     var n	= needles[i];
                     if( n.length > str.length ) {
                         continue;
@@ -783,7 +935,7 @@
             writable: true,
             value: function() {
                 var words	= this.split(' ');
-                for( i in words ) {
+                for( var i in words ) {
                     words[i]	= words[i].capitalize();
                 }
                 return words.join(' ');
@@ -818,7 +970,7 @@
             writable: true,
             value: function() {
                 var keys = this.keys()
-                for( i in keys ) {
+                for( var i in keys ) {
                     delete this[keys[i]]
                 }
             }
@@ -827,7 +979,7 @@
             writable: true,
             value: function() {
                 var copy = {}
-                for( i in this ) {
+                for( var i in this ) {
                     copy[i] = this[i]
                 }
                 return copy
@@ -846,7 +998,7 @@
             value: function() {
                 var items 	= []
                 , keys		= this.keys()
-                for( i=0; i<keys.length; i++ ) {
+                for( var i=0; i<keys.length; i++ ) {
                     items.push( [ keys[i], this[keys[i]] ] )
                 }
                 return items;
@@ -855,7 +1007,14 @@
         "keys": {
             writable: true,
             value: function() {
-                return Object.keys(this);
+                var keys	= Object.keys(this);
+                var filtered	= [];
+                for( var i in keys ) {
+                    if( ! keys[i].in( ['____id'] ) ) {
+                        filtered.append( keys[i] );
+                    }
+                }
+                return filtered;
             }
         },
         "pop": {
@@ -894,7 +1053,7 @@
             writable: true,
             value: function() {
                 var d = dict.apply( null, arguments)
-                for( i in d ) {
+                for( var i in d ) {
                     this[i] = d[i]
                 }
                 return null
@@ -905,7 +1064,7 @@
             value: function() {
                 var values 	= []
                 , keys		= this.keys()
-                for( i=0; i<keys.length; i++ ) {
+                for( var i=0; i<keys.length; i++ ) {
                     values.push( this[keys[i]] )
                 }
                 return values;
@@ -917,16 +1076,28 @@
                 return this.keys().join( str );
             }
         },
-        "id": {
+        "__id__": {
             writable: true,
             value: function() {
                 if( window.__id === undefined ) {
                     window.__id = 0;
                 }
-                if( this.__id === undefined ) {
-                    this.__id = ++window.__id;
+                if( this.____id === undefined ) {
+                    this.____id	= ++window.__id;
                 }
-                return this.__id;
+                return this.____id;
+            }
+        },
+        "__str__": {
+            writable: true,
+            value: function() {
+                return this.__repr__();
+            }
+        },
+        "__repr__": {
+            writable: true,
+            value: function() {
+                return JSON.stringify(this);
             }
         }
     });
