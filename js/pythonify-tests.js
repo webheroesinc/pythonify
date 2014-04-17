@@ -12,12 +12,230 @@
         passes++
     }
 
+    // Check error for expected failure
+    function catch_error(callback, expected) {
+        var error	= "";
+        try {
+            callback();
+        }
+        catch(err) {
+            error	= err;
+        }
+        assert( error.startswith(expected) === true );
+    }
+
     // Testing general functions
+
+    // test is_dict()
+    assert( is_dict({ 'text': 'hello' }) === true )
+    assert( is_dict(window) === true )
+    assert( is_dict([1, 2]) === false )
+    assert( is_dict("string") === false )
+    assert( is_dict(23) === false )
 
     // test len() for list and dict
     assert( len(['hello','world']) === 2 )
     assert( len({ 'text': 'hello', 'value': 'world' }) === 2 )
+
+    // test abs()
+    assert( abs(-2) === 2 )
+
+    // test all()
+    assert( all([true, true]) === true )
+    assert( all([true, false]) === false )
+    assert( all({ one: true, two: true }) === true )
+    assert( all({ one: true, two: false }) === false )
+
+    // test all()
+    assert( any([true, true]) === true )
+    assert( any([true, false]) === true )
+    assert( any([false, false]) === false )
+    assert( any({ one: true, two: true }) === true )
+    assert( any({ one: true, two: false }) === true )
+    assert( any({ one: false, two: false }) === false )
+
+    // test bin()
+    assert( bin(829) == "1100111101" )
+
+    // test bool()
+    assert( bool(true) === true )
+    assert( bool(1) === true )
+    assert( bool(-1) === true )
+    assert( bool(99) === true )
+    assert( bool() === false )
+    assert( bool(0) === false )
+    assert( bool(null) === false )
+    assert( bool(undefined) === false )
+    assert( bool(false) === false )
+
+    // test callable()
+    assert( callable(function() {}) === true )
+    assert( callable(new function() { return function() {} }) === true )
+    assert( callable(new function() {}) === false )
+    assert( callable("not callable") === false )
+    assert( callable(3) === false )
+
+    // test chr()
+    assert( chr(97) === "a" )
+    catch_error( function() { chr(256) }, "ValueError: chr() arg not in range(256)" )
+
+    // test cmp()
+    assert( cmp(1,2) === -1 )
+    assert( cmp(2,2) === 0 )
+    assert( cmp(3,2) === 1 )
     
+    // test delattr()
+    var obj = { "a": true }
+    delattr(obj, 'a')
+    assert( len(obj) === 0 )
+    catch_error( function() { delattr() }, "TypeError: delattr() takes exactly" )
+
+    // test divmod()
+    assert( divmod(10,4)[0] === 2 )
+    assert( divmod(10,4)[1] === 2 )
+    catch_error( function() { divmod() }, "TypeError: divmod() takes exactly" )
+
+    // test enumerate()
+    var l	= enumerate( [1,2] );
+    assert( l[0].length === 2 )
+    assert( l[0][0] === 0 )
+    assert( l[0][1] === 1 )
+    var d	= enumerate( { a: null, b: null } );
+    assert( d[0].length === 2 )
+    assert( d[0][0] === 0 )
+    assert( d[0][1] === "a" )
+
+    // test filter()
+    var d	= { a: true, b: false }
+    assert( filter(function(i) { return true }, [1,2]).length === 2 )
+    assert( filter(function(i) { return i > 1 }, [1,2]).length === 1 )
+    assert( filter(function(i) { return i === "a" }, d).length === 1 )
+    assert( filter(function(i) { return d[i] === false }, d)[0] === "b" )
+
+    // test float()
+    assert( float("2.34") === 2.34 )
+
+    // test frozenset()
+    var fl	= frozenset([1,2])
+    var fd	= frozenset({ a: true, b: false })
+    fl[0]	= 2
+    fd[0]	= "c"
+    assert( fl[0] === 1 )
+    assert( fd[0] === "a" )
+    
+    // test getattr()
+    var obj = { "a": true }    
+    assert( getattr(obj, 'a') === true )
+    assert( getattr(obj, 'b', null) === null )
+    catch_error( function() { getattr(obj, 'b') }, "AttributeError: type object" )
+
+    // test globals()
+    assert( len(globals()) === len(Object.keys(window)) )
+
+    // test hasattr()
+    var obj = { "a": true }    
+    assert( hasattr(obj, 'a') === true )
+    assert( hasattr(obj, 'b') === false )
+    catch_error( function() { hasattr(obj) }, "TypeError: hasattr() takes at least two argument" )
+
+    // test hex()
+    assert( hex(255) === "0xff" )
+    assert( hex(-42) === "-0x2a" )
+    assert( hex(1) === "0x1" )
+    
+    // test id()
+    var d = {};
+    var d2 = {};
+    assert( id(d) === d.id() )
+    assert( id(d) != id(d2) )
+
+    // test int()
+    assert( int() === 0 )
+    assert( int("255") === 255 )
+    assert( int("255.28") === 255 )
+    assert( int("-28") === -28 )
+    assert( int(-28) === -28 )
+    assert( int(-28, 2) === "-11100" )
+    assert( int(255, 4) === "3333" )
+    assert( int(255, 6) === "1103" )
+    assert( int(255, 8) === "377" )
+    assert( int(255, 16) === "ff" )
+
+    // test isinstance()
+    assert( isinstance([], Array) === true )
+    assert( isinstance("", String) === true )
+    assert( isinstance(4, Number) === true )
+    assert( isinstance("", String) === true )
+    assert( isinstance(4, Number) === true )
+    assert( isinstance([], Object) === false )
+    assert( isinstance({}, Array) === false )
+    assert( isinstance("4", Number) === false )
+    assert( isinstance(4, String) === false )
+    assert( isinstance(4, Object) === false )
+
+    // This doesn't truly subclass, rather than inheriting parent prototypes we are sharing a
+    // prototype.  There must be a way to only inherit the parent prototype, perhaps with some sort
+    // of prototype clone.
+    function foo() {}
+    foo.prototype = Array.prototype
+    function bar() {}
+    bar.prototype = foo.prototype
+
+    // test issubclass()
+    assert( issubclass(Array, Object) === true )
+    assert( issubclass(String, Object) === true )
+    assert( issubclass(foo, Array) === true )
+    assert( issubclass(bar, foo) === true )
+    assert( issubclass(foo, Array) === true )
+    assert( issubclass(Object, Array) === false )
+
+    // test iter()
+    var i	= 0;
+    assert( len( iter(function() { return i++ }, 5) ) === 5 )
+    assert( len( iter([1,2,3,4]) ) === 4 )
+    assert( len( iter({ a: 1, b: 1 }) ) === 2 )
+
+    // test max()
+    var d	= { "a": 4, "b": 1, "z": 0 };
+    assert( max([3,7,5,3,8,67]) === 67 )
+    assert( max(d) === "z" )
+    assert( max(d, key=function(x) { return d[x] }) === "a" )
+    assert( max(3,7,5,3,8,67) === 67 )
+    assert( max({ x: 1 }, { a: 4 }, { f: 29 }, key=function(x) { return x.keys()[0] }).x === 1 )
+
+    // test min()
+    var d	= { "a": 4, "b": 1, "z": 0 };
+    assert( min([3,7,5,3,8,67]) === 3 )
+    assert( min(d) === "a" )
+    assert( min(d, key=function(x) { return d[x] }) === "z" )
+    assert( min(3,7,5,3,8,67) === 3 )
+    assert( min({ x: 1 }, { a: 4 }, { f: 29 }, key=function(x) { return x.keys()[0] }).a === 4 )
+
+    // test object()
+    assert( object() instanceof Object )
+
+    // test oct()
+    assert( oct(255) === "0377" )
+    assert( oct(-42) === "-052" )
+    assert( oct(1) === "01" )
+    
+    // test ord()
+    assert( ord("a") === 97 )
+    
+    // test pow()
+    assert( pow(2,8) === 256 )
+    assert( pow(2,8, 255) === 1 )
+
+    // test range()
+    assert( len(range(8)) === 8 )
+    assert( len(range(2,8)) === 6 )
+    assert( len(range(1,0)) === 0 )
+    assert( len(range(0,8,2)) === 4 )
+    assert( len(range(0,-10,-1)) === 10 )
+    assert( len(range(0,10,-1)) === 0 )
+    catch_error( function() { len(range(0,10,0)) === 0 }, "ValueError: range() step argument must not be zero" )
+
+
 
     // Testing dict
     
@@ -45,8 +263,8 @@
     
     // test dict.get()
     assert( d.get('plc', null) === "xxplc1" )
-    assert( d.get('nothing', null) === null )
-    assert( d.get('nothing') === undefined )
+    assert( d.get('nothing', 1) === 1 )
+    assert( d.get('nothing') === null )
     assert( len(d) === 2 )
 
     // test dict.keys()
@@ -71,7 +289,12 @@
     assert( d.pop('nothing', null) === null )
     assert( len(d) == 1 )
 
-    // test dict.pop()
+    // test dict.popitem()
+    d3 = d.copy()
+    assert( d3.popitem() )
+    assert( len(d3) == 0 )
+
+    // test dict.setdefault()
     assert( d.setdefault('plc') === null )
     assert( d.setdefault('plc', 1) === null )
     assert( d.setdefault('new', 1) === 1 )
@@ -85,6 +308,17 @@
     assert( d['help'] == 'your mom' )
     assert( d['registers'][0] == 'hot dogs' )
     assert( len(d) == 4 )
+
+
+    // test tuple
+
+    // test tuple init
+    var tl	= tuple([1,2])
+    var td	= tuple({ a: true, b: false })
+    tl[0]	= 2
+    td[0]	= "c"
+    assert( tl[0] === 1 )
+    assert( td[0] === "a" )
 
 
     // Testing list
@@ -140,6 +374,12 @@
     // test list.count()
     l.extend(['mom','mom'])
     assert( l.count('mom') == 3 )
+
+    // test list.copy()
+    var nl	= l.copy()
+    nl.pop();
+    assert( nl.length == 3 )
+    assert( l.length == 4 )
 
     // test list.reverse()
     assert( l.reverse()[0] == 'mom' )
@@ -197,14 +437,7 @@
     assert( s.find('rl', 0, -2) == -1 )
 
     // test string.index()
-    var error;
-    try {
-        s.index('los');
-    }
-    catch(err) {
-        error = err
-    }
-    assert( error == "ValueError" )
+    catch_error( function() { s.index('los') }, "ValueError" )
     assert( s.index('rl') == 8 )
 
     // test string.format()
@@ -277,14 +510,7 @@
     assert( s.rfind('ld', 0, -2) == -1 )
 
     // test string.index()
-    var error;
-    try {
-        s.rindex('los');
-    }
-    catch(err) {
-        error = err
-    }
-    assert( error == "ValueError" )
+    catch_error( function() { s.rindex('los') }, "ValueError" )
     assert( s.rindex('ld') == 9 )
 
     // test string.rpartition()
@@ -345,16 +571,16 @@
 
     console.log("Passed all "+passes+" tests");
 
-    iterrange = generator(function( start, stop ) {
-        var current	= this.count + start;
-        if( current <= stop ) {
-            return current;
-        }
-        else {
-            return undefined;
-        }
-    });
-    range = iterrange(11, 30);
-    console.log(["range", range])
+    // iterrange = generator(function( start, stop ) {
+    //     var current	= this.count + start;
+    //     if( current <= stop ) {
+    //         return current;
+    //     }
+    //     else {
+    //         return undefined;
+    //     }
+    // });
+    // range = iterrange(11, 30);
+    // console.log(["range", range])
 
 })(window);

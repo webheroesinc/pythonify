@@ -14,21 +14,21 @@
         return x;
     }
 
-    function is_dict(obj) {
-        if( typeof( obj.constructor.create ) == 'function' ) {
+    window.is_dict = function(obj) {
+        if( obj.constructor.name == 'Object' || obj.constructor.name == 'Window' ) {
             return true
         }
         return false
     }
 
-    function is_list(array) {
+    window.is_list = function(array) {
         if( Array.isArray(array) ) {
             return true
         }
         return false
     }
 
-    function is_iterable(iter) {
+    window.is_iterable = function(iter) {
         if( iter.length !== undefined && typeof iter !== 'string' ) {
             return true
         }
@@ -47,6 +47,13 @@
         }
         return length;
     }
+    window.len		= len
+
+    function tuple(iter) {
+        var sequence	= is_dict(iter) ? iter.keys() : iter.copy();
+        return Object.freeze(sequence)
+    }
+    window.tuple	= tuple
 
     function list() {
         if( arguments.length == 1 && is_iterable(arguments[0]) ) {
@@ -56,21 +63,29 @@
             return Array.apply( null, arguments)
         }
     }
+    window.list		= list
 
     function dict() {
         // this checks if the Object is actually a dict like object
         if( arguments.length == 1
             && is_dict( arguments[0] ) ) {
-            return arguments[0]
+            var d	= {};
+            var iter	= arguments[0];
+            var keys	= Object.keys(iter);
+            for( i in keys ) {
+                var k	= keys[i];
+                d[k]	= iter[k];
+            }
+            return d;
         }
         else {
-            var d = {}
+            var d = {};
             for( i in arguments ) {
                 if( arguments[i].length == 2 ) {
-                    d[arguments[i][0]] = arguments[i][1]
+                    d[arguments[i][0]] = arguments[i][1];
                 }
                 else {
-                    continue
+                    continue;
                 }
             }
             return d
@@ -84,6 +99,258 @@
         }
         return a
     }
+    window.dict		= dict
+
+    window.abs = function(x) {
+        return Math.abs(x);
+    }
+    window.all = function(iter) {
+        for( i in iter ) {
+            if( ! iter[i] ) {
+                return false;
+            }
+        }
+        return true;
+    }
+    window.any = function(iter) {
+        for( i in iter ) {
+            if( iter[i] ) {
+                return true;
+            }
+        }
+        return false;
+    }
+    window.bin = function(x) {
+        return x.toString(2)
+    }
+    window.bool = function(x) {
+        return x ? true : false;
+    }
+    window.callable = function(obj) {
+        return typeof obj === "function" ? true : false;
+    }
+    window.chr = function(i) {
+        if( i >= 0 && i < 256 ) {
+            return String.fromCharCode(i);
+        }
+        else {
+            throw "ValueError: chr() arg not in range(256)";
+        }
+    }
+    window.cmp = function(x,y) {
+        return x < y ? -1 : x === y ? 0 : x > y ? 1 : null;
+    }
+    // window.compile:	Not sure if Javascript can do this
+    // window.complex:	mathjs.org does this
+    window.delattr = function(obj, name) {
+        if( arguments.length !== 2 ) {
+            throw "TypeError: delattr() takes exactly two argument ("+arguments.length+" given)"
+        }
+        delete obj[name];
+    }
+    // window.dir:	Not sure if you can iterate over hidden properties
+    window.divmod = function(a,b) {
+        if( arguments.length !== 2 ) {
+            throw "TypeError: divmod() takes exactly two argument ("+arguments.length+" given)";
+        }
+        return [Math.floor(a/b), a % b];
+    }
+    window.enumerate = function(sequence, start) {
+        var results	= [];
+        var sequence	= is_dict(sequence) ? sequence.keys() : sequence;
+        var start	= start === undefined ? 0 : start;
+        for( var i=start; i < sequence.length; i++ ) {
+            results.append( [i, sequence[i]] );
+        }
+        return results;
+    }
+    // window.eval:	Figure out a way to make eval ONLY handle expressions
+    window.filter = function(callback, iter) {
+        var results	= [];
+        var sequence	= is_dict(iter) ? iter.keys() : iter;
+        for( var i=0; i < sequence.length; i++ ) {
+            var x	= sequence[i];
+            if( callback( x ) === true ) {
+                results.append( x );
+            }
+        }
+        return results;
+    }
+    // window.format:	Later...
+    window.frozenset = function(iter) {
+        var sequence	= is_dict(iter)
+            ? iter.keys()
+            : iter.copy();
+        return Object.freeze(sequence);
+    }
+    window.float = function(x) {
+        return parseFloat(x);
+    }
+    window.getattr = function(obj, name, dflt) {
+        if( arguments.length < 2 ) {
+            throw "TypeError: getattr() takes at least two argument ("+arguments.length+" given)";
+        }
+        if( obj[name] === undefined ) {
+            if( dflt === undefined ) {
+                throw "AttributeError: type object '"+(obj.name ? obj.name : obj.constructor.name)+"' has no attribute '"+name+"'";
+            }
+            else {
+                return dflt;
+            }
+        }
+        return obj[name];
+    }
+    window.globals = function() {
+        return dict(window);
+    }
+    window.hasattr = function(obj, name) {
+        if( arguments.length < 2 ) {
+            throw "TypeError: hasattr() takes at least two argument ("+arguments.length+" given)";
+        }
+        return obj[name] === undefined ? false : true;
+    }
+    // window.hash:	Not sure what python's hash does
+    // window.help:	??? possibly N/A
+    window.hex = function(n) {
+        return (n < 0 ? "-" : "") + "0x"+abs(n).toString(16);
+    }
+    window.id = function(obj) {
+        return obj.id();
+    }
+    window.input = function(text) {
+        return eval(prompt(text));
+    }
+    window.raw_input = function(text) {
+        return prompt(text);
+    }
+    window.int = function(x, base) {
+        return x === undefined ? 0 : base === undefined ? parseInt(x) : parseInt(x).toString(base);
+    }
+    window.isinstance = function(obj, classinfo) {
+        return obj.constructor.name.lower() == classinfo.name.lower();
+    }
+    window.issubclass = function(cls, classinfo) {
+        return new cls instanceof classinfo;
+    }
+    window.iter = function(o, sentinel) {
+        if( sentinel === undefined ) {
+            return is_dict(o)
+                ? o.keys()
+                : o.copy();
+        }
+        else {
+            var r	= [];
+            var v	= o();
+            while( v !== sentinel ) {
+                r.append(v);
+                v	= o();
+            }
+            return r;
+        }
+    }
+    // window.locals:	??? would be the same as globals
+    // window.long:	??? would be the same as int
+    window.map = function(callback, iter) {
+        
+    }
+    window.max = function() {
+        var key		= undefined;
+        var sequence	= new Array().slice.apply(arguments);
+        if( callable( arguments[arguments.length-1] ) ) {
+            key		= arguments[arguments.length-1];
+            sequence	= sequence.slice(0,-1);
+        }
+        if( len(sequence) === 1 ) {
+            var iter	= sequence[0];
+            sequence	= is_dict(iter) ? iter.keys() : iter;
+        }
+        var match	= sequence[0];
+        var maxvalue	= key === undefined ? match : key( match );
+        for( var i=1; i < sequence.length; i++ ) {
+            var v	= sequence[i];
+            var m	= key === undefined ? v : key( v );
+            if( m > maxvalue ) {
+                maxvalue	= m;
+                match		= v;
+            }
+        }
+        return match;
+    }
+    window.min = function() {
+        var key		= undefined;
+        var sequence	= new Array().slice.apply(arguments);
+        if( callable( arguments[arguments.length-1] ) ) {
+            key		= arguments[arguments.length-1];
+            sequence	= sequence.slice(0,-1);
+        }
+        if( len(sequence) === 1 ) {
+            var iter	= sequence[0];
+            sequence	= is_dict(iter) ? iter.keys() : iter;
+        }
+        var match	= sequence[0];
+        var minvalue	= key === undefined ? match : key( match );
+        for( var i=1; i < sequence.length; i++ ) {
+            var v	= sequence[i];
+            var m	= key === undefined ? v : key( v );
+            if( m < minvalue ) {
+                minvalue	= m;
+                match		= v;
+            }
+        }
+        return match;
+    }
+    // window.next:	Need to implement iterators/generators better
+    window.object = function(n) {
+        return new Object();
+    }
+    window.oct = function(n) {
+        return (n < 0 ? "-" : "") + "0"+abs(n).toString(8);
+    }
+    // window.open:	No file handling
+    window.ord = function(i) {
+        if( i.length === 1 ) {
+            return i.charCodeAt(0);
+        }
+        else {
+            throw "TypeError: ord() expected a character, but string of length "+i.length+" found";
+        }
+    }
+    window.pow = function(x, y, z) {
+        return z === undefined ? Math.pow(x, y) : Math.pow(x, y) % z;
+    }
+    window.range = function() {
+        if( len(arguments) === 0 ) {
+            throw "TypeError: range() takes at least one argument ("+arguments.length+" given)";
+        }
+        var start	= 0;
+        var stop	= undefined;
+        var step	= arguments[2] === undefined ? 1 : arguments[2];
+        if( step === 0 ) {
+            throw "ValueError: range() step argument must not be zero";
+        }
+        if( len(arguments) === 1 ) {
+            stop	= arguments[0];
+        }
+        else {
+            start	= arguments[0];
+            stop	= arguments[1];
+        }
+        var r		= [];
+        if( step > 0 ) {
+            for( var i=start; i < stop; i+=step ) {
+                r.append(i);
+            }
+        }
+        else if( step < 0 ) {
+            for( var i=start; i > stop; i+=step ) {
+                r.append(i);
+            }
+        }
+        return r;
+    }
+    // window.print:	??? What to do for print?
+
+
     
     Object.defineProperties( Array.prototype, {
         "append": {
@@ -135,6 +402,12 @@
                     this[i] === value ? c++ : null;
                 }
                 return c
+            }
+        },
+        "copy": {
+            writable: true,
+            value: function() {
+                return this.slice();
             }
         }
     });
@@ -537,46 +810,14 @@
     
     // Object property definitions must be done last
     Object.defineProperties( Object.prototype, {
-        "get": {
+        "iter": {
             writable: true,
-            value: function( key, dflt ) {
-                return this[key] || dflt === undefined
-                    ? this[key]
-                    : dflt;
-            }
-        },
-        "keys": {
-            writable: true,
-            value: function() {
-                return Object.keys(this);
-            }
-        },
-        "values": {
-            writable: true,
-            value: function() {
-                var values 	= []
-                , keys		= this.keys()
-                for( i=0; i<keys.length; i++ ) {
-                    values.push( this[keys[i]] )
-                }
-                return values;
-            }
-        },
-        "items": {
-            writable: true,
-            value: function() {
-                var items 	= []
-                , keys		= this.keys()
-                for( i=0; i<keys.length; i++ ) {
-                    items.push( [ keys[i], this[keys[i]] ] )
-                }
-                return items;
-            }
+            value: Object.prototype.keys
         },
         "clear": {
             writable: true,
             value: function() {
-                keys	= this.keys()
+                var keys = this.keys()
                 for( i in keys ) {
                     delete this[keys[i]]
                 }
@@ -592,6 +833,31 @@
                 return copy
             }
         },
+        "get": {
+            writable: true,
+            value: function( key, dflt ) {
+                return this[key] !== undefined
+                    ? this[key]
+                    : dflt || null;
+            }
+        },
+        "items": {
+            writable: true,
+            value: function() {
+                var items 	= []
+                , keys		= this.keys()
+                for( i=0; i<keys.length; i++ ) {
+                    items.push( [ keys[i], this[keys[i]] ] )
+                }
+                return items;
+            }
+        },
+        "keys": {
+            writable: true,
+            value: function() {
+                return Object.keys(this);
+            }
+        },
         "pop": {
             writable: true,
             value: function(key, dflt) {
@@ -603,6 +869,12 @@
                 else {
                     return dflt;
                 }
+            }
+        },
+        "popitem": {
+            writable: true,
+            value: function() {
+                return this.pop( this.keys()[0] );
             }
         },
         "setdefault": {
@@ -628,13 +900,241 @@
                 return null
             }
         },
+        "values": {
+            writable: true,
+            value: function() {
+                var values 	= []
+                , keys		= this.keys()
+                for( i=0; i<keys.length; i++ ) {
+                    values.push( this[keys[i]] )
+                }
+                return values;
+            }
+        },
         "join": {
             writable: true,
             value: function( str ) {
                 return this.keys().join( str );
             }
+        },
+        "id": {
+            writable: true,
+            value: function() {
+                if( window.__id === undefined ) {
+                    window.__id = 0;
+                }
+                if( this.__id === undefined ) {
+                    this.__id = ++window.__id;
+                }
+                return this.__id;
+            }
         }
     });
+
+    function utf8_encode(argString) {
+        //  discuss at: http://phpjs.org/functions/utf8_encode/
+        // original by: Webtoolkit.info (http://www.webtoolkit.info/)
+        // improved by: Kevin van Zonneveld (http://kevin.vanzonneveld.net)
+        // improved by: sowberry
+        // improved by: Jack
+        // improved by: Yves Sucaet
+        // improved by: kirilloid
+        // bugfixed by: Onno Marsman
+        // bugfixed by: Onno Marsman
+        // bugfixed by: Ulrich
+        // bugfixed by: Rafal Kukawski
+        // bugfixed by: kirilloid
+        //   example 1: utf8_encode('Kevin van Zonneveld');
+        //   returns 1: 'Kevin van Zonneveld'
+
+        if (argString === null || typeof argString === 'undefined') {
+            return '';
+        }
+
+        // .replace(/\r\n/g, "\n").replace(/\r/g, "\n");
+        var string = (argString + '');
+        var utftext = '',
+        start, end, stringl = 0;
+
+        start = end = 0;
+        stringl = string.length;
+        for (var n = 0; n < stringl; n++) {
+            var c1 = string.charCodeAt(n);
+            var enc = null;
+
+            if (c1 < 128) {
+                end++;
+            } else if (c1 > 127 && c1 < 2048) {
+                enc = String.fromCharCode(
+                    (c1 >> 6) | 192, (c1 & 63) | 128
+                );
+            } else if ((c1 & 0xF800) != 0xD800) {
+                enc = String.fromCharCode(
+                    (c1 >> 12) | 224, ((c1 >> 6) & 63) | 128, (c1 & 63) | 128
+                );
+            } else {
+                // surrogate pairs
+                if ((c1 & 0xFC00) != 0xD800) {
+                    throw new RangeError('Unmatched trail surrogate at ' + n);
+                }
+                var c2 = string.charCodeAt(++n);
+                if ((c2 & 0xFC00) != 0xDC00) {
+                    throw new RangeError('Unmatched lead surrogate at ' + (n - 1));
+                }
+                c1 = ((c1 & 0x3FF) << 10) + (c2 & 0x3FF) + 0x10000;
+                enc = String.fromCharCode(
+                    (c1 >> 18) | 240, ((c1 >> 12) & 63) | 128, ((c1 >> 6) & 63) | 128, (c1 & 63) | 128
+                );
+            }
+            if (enc !== null) {
+                if (end > start) {
+                    utftext += string.slice(start, end);
+                }
+                utftext += enc;
+                start = end = n + 1;
+            }
+        }
+
+        if (end > start) {
+            utftext += string.slice(start, stringl);
+        }
+
+        return utftext;
+    }
+
+    function sha1(str) {
+        //  discuss at: http://phpjs.org/functions/sha1/
+        // original by: Webtoolkit.info (http://www.webtoolkit.info/)
+        // improved by: Michael White (http://getsprink.com)
+        // improved by: Kevin van Zonneveld (http://kevin.vanzonneveld.net)
+        //    input by: Brett Zamir (http://brett-zamir.me)
+        //  depends on: utf8_encode
+        //   example 1: sha1('Kevin van Zonneveld');
+        //   returns 1: '54916d2e62f65b3afa6e192e6a601cdbe5cb5897'
+
+        var rotate_left = function(n, s) {
+            var t4 = (n << s) | (n >>> (32 - s));
+            return t4;
+        };
+
+        var cvt_hex = function(val) {
+            var str = '';
+            var i;
+            var v;
+
+            for (i = 7; i >= 0; i--) {
+                v = (val >>> (i * 4)) & 0x0f;
+                str += v.toString(16);
+            }
+            return str;
+        };
+
+        var blockstart;
+        var i, j;
+        var W = new Array(80);
+        var H0 = 0x67452301;
+        var H1 = 0xEFCDAB89;
+        var H2 = 0x98BADCFE;
+        var H3 = 0x10325476;
+        var H4 = 0xC3D2E1F0;
+        var A, B, C, D, E;
+        var temp;
+
+        str = utf8_encode(str);
+        var str_len = str.length;
+
+        var word_array = [];
+        for (i = 0; i < str_len - 3; i += 4) {
+            j = str.charCodeAt(i) << 24 | str.charCodeAt(i + 1) << 16 | str.charCodeAt(i + 2) << 8 | str.charCodeAt(i + 3);
+            word_array.push(j);
+        }
+
+        switch (str_len % 4) {
+        case 0:
+            i = 0x080000000;
+            break;
+        case 1:
+            i = str.charCodeAt(str_len - 1) << 24 | 0x0800000;
+            break;
+        case 2:
+            i = str.charCodeAt(str_len - 2) << 24 | str.charCodeAt(str_len - 1) << 16 | 0x08000;
+            break;
+        case 3:
+            i = str.charCodeAt(str_len - 3) << 24 | str.charCodeAt(str_len - 2) << 16 | str.charCodeAt(str_len - 1) <<
+                8 | 0x80;
+            break;
+        }
+
+        word_array.push(i);
+
+        while ((word_array.length % 16) != 14) {
+            word_array.push(0);
+        }
+
+        word_array.push(str_len >>> 29);
+        word_array.push((str_len << 3) & 0x0ffffffff);
+
+        for (blockstart = 0; blockstart < word_array.length; blockstart += 16) {
+            for (i = 0; i < 16; i++) {
+                W[i] = word_array[blockstart + i];
+            }
+            for (i = 16; i <= 79; i++) {
+                W[i] = rotate_left(W[i - 3] ^ W[i - 8] ^ W[i - 14] ^ W[i - 16], 1);
+            }
+
+            A = H0;
+            B = H1;
+            C = H2;
+            D = H3;
+            E = H4;
+
+            for (i = 0; i <= 19; i++) {
+                temp = (rotate_left(A, 5) + ((B & C) | (~B & D)) + E + W[i] + 0x5A827999) & 0x0ffffffff;
+                E = D;
+                D = C;
+                C = rotate_left(B, 30);
+                B = A;
+                A = temp;
+            }
+
+            for (i = 20; i <= 39; i++) {
+                temp = (rotate_left(A, 5) + (B ^ C ^ D) + E + W[i] + 0x6ED9EBA1) & 0x0ffffffff;
+                E = D;
+                D = C;
+                C = rotate_left(B, 30);
+                B = A;
+                A = temp;
+            }
+
+            for (i = 40; i <= 59; i++) {
+                temp = (rotate_left(A, 5) + ((B & C) | (B & D) | (C & D)) + E + W[i] + 0x8F1BBCDC) & 0x0ffffffff;
+                E = D;
+                D = C;
+                C = rotate_left(B, 30);
+                B = A;
+                A = temp;
+            }
+
+            for (i = 60; i <= 79; i++) {
+                temp = (rotate_left(A, 5) + (B ^ C ^ D) + E + W[i] + 0xCA62C1D6) & 0x0ffffffff;
+                E = D;
+                D = C;
+                C = rotate_left(B, 30);
+                B = A;
+                A = temp;
+            }
+
+            H0 = (H0 + A) & 0x0ffffffff;
+            H1 = (H1 + B) & 0x0ffffffff;
+            H2 = (H2 + C) & 0x0ffffffff;
+            H3 = (H3 + D) & 0x0ffffffff;
+            H4 = (H4 + E) & 0x0ffffffff;
+        }
+
+        temp = cvt_hex(H0) + cvt_hex(H1) + cvt_hex(H2) + cvt_hex(H3) + cvt_hex(H4);
+        return temp.toLowerCase();
+    }
+    
 
     // usage:
     // 
@@ -678,10 +1178,6 @@
         [].push.call( this._args, item );
         return this._args.length;
     }
-
-    window.len		= len
-    window.list		= list
-    window.dict		= dict
     window.generator	= generator
 
 })(window);
