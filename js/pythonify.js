@@ -15,14 +15,22 @@
     }
 
     window.is_complex = function(obj) {
-        return is_dict(obj) || is_list(obj) ? true : false;
+        return is_dict(obj) || is_list(obj) || is_window(obj) ? true : false;
+    }
+
+    window.is_window = function(obj) {
+        window.asdfghjkl = true;
+        var answer	= obj.asdfghjkl === true
+        delete window.asdfghjkl;
+        return answer;
     }
 
     window.is_dict = function(obj) {
         if( obj.callee !== undefined ) {
             return false;
         }
-        if( obj.constructor.name == 'Object' || obj.constructor.name == 'Window' ) {
+        if( obj.constructor.name == 'Object'
+            || is_window(obj) ) {
             return true
         }
         return false
@@ -44,17 +52,17 @@
 
     function len( iter ) {
         var length = 0;
+        if( iter.length )
+            return iter.length;
         if( is_complex(iter) ) {
             var keys	= iter.keys();
-            for( var i in keys ) {
-                var key	= keys[i];
-                if (iter.hasOwnProperty(key)) length++;
-            }
+            length	= keys.length;
+            // for( var i in keys ) {
+            //     var key	= keys[i];
+            //     if (iter.hasOwnProperty(key)) length++;
+            // }
         }
-        else if( iter.length ) {
-            return iter.length;
-        }
-        return length;
+        return length || 0;
     }
     window.len		= len
 
@@ -114,16 +122,18 @@
         return Math.abs(x);
     }
     window.all = function(iter) {
-        for( var i in iter ) {
-            if( ! iter[i] ) {
+        var sequence	= is_dict(iter) ? iter.keys() : iter;
+        for( var i in sequence ) {
+            if( ! sequence[i] ) {
                 return false;
             }
         }
         return true;
     }
     window.any = function(iter) {
-        for( var i in iter ) {
-            if( iter[i] ) {
+        var sequence	= is_dict(iter) ? iter.keys() : iter;
+        for( var i in sequence ) {
+            if( sequence[i] ) {
                 return true;
             }
         }
@@ -210,7 +220,7 @@
         return obj[name];
     }
     window.globals = function() {
-        return dict(window);
+        return window;
     }
     window.hasattr = function(obj, name) {
         if( arguments.length < 2 ) {
@@ -237,7 +247,13 @@
         return x === undefined ? 0 : base === undefined ? parseInt(x) : parseInt(x).toString(base);
     }
     window.isinstance = function(obj, classinfo) {
-        return obj.constructor.name.lower() == classinfo.name.lower();
+        if( is_window(obj) )
+            return false;
+        if( obj instanceof classinfo )
+            return true;
+        if( new obj.constructor() instanceof classinfo )
+            return true;
+        return false;
     }
     window.issubclass = function(cls, classinfo) {
         return new cls instanceof classinfo;
@@ -468,6 +484,38 @@
 
         return total;
     }
+    window.Super = function(classinfo, obj) {
+        if( ! isinstance(obj, classinfo) ) {
+            throw "obj must be an instance of classinfo";
+        }
+        var parent	= classinfo.prototype.__parent__;
+
+        if( window.__clones__ === undefined ) {
+            window.__clones__	= {};
+        }
+        if( window.__clones__[id(parent)] !== undefined ) {
+            return new window.__clones__[id(parent)]();
+        }
+
+        var proto_props	= Object.getOwnPropertyNames(parent.prototype);
+        var clone	= function() {};
+        for( i in proto_props ) {
+            var prop	= proto_props[i];
+            if( callable(parent.prototype[prop]) ) {
+                (function(p) {
+                    clone.prototype[prop] = function() {
+                        var result = parent.prototype[p].apply( obj, arguments );
+                        return result;
+                    }
+                })(prop);
+            }
+            else {
+                clone.prototype[prop] = parent.prototype[prop];
+            }
+        }
+        window.__clones__[id(parent)] = clone;
+        return new clone();
+    }
     window.type = function(obj) {
         if( obj === undefined )
             throw "TypeError: type() takes exactly one argument ("+arguments.length+" given)";
@@ -493,21 +541,48 @@
         }
         return ziplist;
     }
+    window.subclass = function(classinfo, methods, name, namespace) {
+        if( arguments.length === 0 )
+            throw "TypeError: subclass() takes at least one argument (0 given)";
+        if( methods !== undefined && methods !== null && ! is_dict(methods) )
+            throw "TypeError: methods must be a dict object";
+        
+        methods		= methods !== undefined && methods !== null ? methods : {};
+        if( methods.__init__ === undefined ) {
+            methods.__init__			= function() {
+                return isinstance( this, __tmpclass ) ? this : new __tmpclass();
+            }
+        }
+        var __tmpclass	= methods.__init__ || function() {};
+        __tmpclass.prototype			= new classinfo();
+        __tmpclass.prototype.__parent__		= classinfo;
+        for( key in methods ) {
+            __tmpclass.prototype[key]	= methods[key];
+        }
+        if( name !== undefined ) {
+            __tmpclass.prototype.__name__	= name;
+            namespace				= namespace === undefined ? window : namespace;
+            namespace[name]			= __tmpclass;
+        }
+
+        return __tmpclass;
+    }
     
 
     
     Object.defineProperties( Array.prototype, {
         "append": {
             writable: true,
-            value: Array.prototype.push
+            value: function() {
+                return Array.prototype.push.apply(this, arguments);
+            }
         },
         "extend": {
             writable: true,
             value: function(arr) {
-                var keys	= arr.keys();
-                for( var i in keys ) {
-                    var k	= keys[i];
-                    this.append(arr[k])
+                for( var i in arr ) {
+                    var k	= arr[i];
+                    this.append(k)
                 }
             }
         },
@@ -554,6 +629,18 @@
             writable: true,
             value: function() {
                 return this.slice();
+            }
+        },
+        "__str__": {
+            writable: true,
+            value: function() {
+                return this.__repr__();
+            }
+        },
+        "__repr__": {
+            writable: true,
+            value: function() {
+                return "["+map( str, this ).join(",")+"]";
             }
         },
         "__reversed__": {
@@ -964,7 +1051,9 @@
     Object.defineProperties( Object.prototype, {
         "iter": {
             writable: true,
-            value: Object.prototype.keys
+            value: function() {
+                return this.keys();
+            }
         },
         "clear": {
             writable: true,
@@ -985,7 +1074,14 @@
                 return copy
             }
         },
-        "get": {
+        "Get": {
+        // "get" is, for some reason, considered a getter function even when on a prototype and not
+        // a property definition which causes any Object.defineProperty( Object.prototype, ...)
+        // later in the script to fail with the error:
+        // 
+        //     TypeError: Invalid property.  A property cannot both have accessors and be writable or have a value, #<Object>
+        //     
+        // This can be fixed by capitalizing the G to make "Get".
             writable: true,
             value: function( key, dflt ) {
                 return this[key] !== undefined
@@ -1007,14 +1103,7 @@
         "keys": {
             writable: true,
             value: function() {
-                var keys	= Object.keys(this);
-                var filtered	= [];
-                for( var i in keys ) {
-                    if( ! keys[i].in( ['____id'] ) ) {
-                        filtered.append( keys[i] );
-                    }
-                }
-                return filtered;
+                return Object.keys(this);;
             }
         },
         "pop": {
@@ -1083,7 +1172,10 @@
                     window.__id = 0;
                 }
                 if( this.____id === undefined ) {
-                    this.____id	= ++window.__id;
+                    Object.defineProperty( this, "____id", {
+                        writable: true,
+                        value: ++window.__id
+                    });
                 }
                 return this.____id;
             }

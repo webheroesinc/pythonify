@@ -1,0 +1,48 @@
+#+TITLE: Pythonify.js
+#+STYLE: <link rel="stylesheet" type="text/css" href="org.css" />
+
+* Overview
+
+  
+
+* Built-in Functions
+
+  - *Same* - Arguments and returned value are the same as the Python method.
+  - *Different* - Written but 
+  - *Different Args* - Written but 
+  - *Different Return* - Written but 
+  - *Not Implemented* - Has not been written yet.
+
+  | [[https://docs.python.org/2/library/functions.html#abs][*abs()*]]         | Same            | [[https://docs.python.org/2/library/functions.html#divmod][*divmod()*]]    | Same            | [[https://docs.python.org/2/library/functions.html#input][*input()*]]      | Same            | [[https://docs.python.org/2/library/functions.html#open][*open()*]]       | Not Implemented | [[https://docs.python.org/2/library/functions.html#staticmethod][*staticmethod()*]]   | Not Implemented |
+  | [[https://docs.python.org/2/library/functions.html#all][*all()*]]         | Same            | [[https://docs.python.org/2/library/functions.html#enumerate][*enumerate()*]] | Different       | [[https://docs.python.org/2/library/functions.html#int][*int()*]]        | Same            | [[https://docs.python.org/2/library/functions.html#ord][*ord()*]]        | Same            | [[https://docs.python.org/2/library/functions.html#str][*str()*]]            | Same            |
+  | [[https://docs.python.org/2/library/functions.html#any][*any()*]]         | Same            | [[https://docs.python.org/2/library/functions.html#eval][*eval()*]]      | Different       | [[https://docs.python.org/2/library/functions.html#isinstance][*isinstance()*]] | Different       | [[https://docs.python.org/2/library/functions.html#pow][*pow()*]]        | Same            | [[https://docs.python.org/2/library/functions.html#sum][*sum()*]]            | Same            |
+  | [[https://docs.python.org/2/library/functions.html#basestring][*basestring()*]]  | Not Implemented | [[https://docs.python.org/2/library/functions.html#execfile][*execfile()*]]  | Not Implemented | [[https://docs.python.org/2/library/functions.html#issubclass][*issubclass()*]] | Different       | [[https://docs.python.org/2/library/functions.html#print][*print()*]]      | Not Implemented | [[https://docs.python.org/2/library/functions.html#super][*super()*]]          | Different       |
+  | [[https://docs.python.org/2/library/functions.html#bin][*bin()*]]         | Same            | [[https://docs.python.org/2/library/functions.html#file][*file()*]]      | Not Implemented | [[https://docs.python.org/2/library/functions.html#iter][*iter()*]]       | Different       | [[https://docs.python.org/2/library/functions.html#property][*property()*]]   | Not Implemented | [[https://docs.python.org/2/library/functions.html#tuple][*tuple()*]]          | Same            |
+  | [[https://docs.python.org/2/library/functions.html#bool][*bool()*]]        | Same            | [[https://docs.python.org/2/library/functions.html#filter][*filter()*]]    | Same            | [[https://docs.python.org/2/library/functions.html#len][*len()*]]        | Same            | [[https://docs.python.org/2/library/functions.html#range][*range()*]]      | Same            | [[https://docs.python.org/2/library/functions.html#type][*type()*]]           | Same            |
+  | [[https://docs.python.org/2/library/functions.html#bytearray][*bytearray()*]]   | Not Implemented | [[https://docs.python.org/2/library/functions.html#float][*float()*]]     | Same            | [[https://docs.python.org/2/library/functions.html#list][*list()*]]       | Same            | [[https://docs.python.org/2/library/functions.html#raw_input][*raw\_input()*]] | Same            | [[https://docs.python.org/2/library/functions.html#unichr][*unichr()*]]         | Not Implemented |
+  | [[https://docs.python.org/2/library/functions.html#callable][*callable()*]]    | Same            | [[https://docs.python.org/2/library/functions.html#format][*format()*]]    | Same            | [[https://docs.python.org/2/library/functions.html#locals][*locals()*]]     | Not Implemented | [[https://docs.python.org/2/library/functions.html#reduce][*reduce()*]]     | Same            | [[https://docs.python.org/2/library/functions.html#unicode][*unicode()*]]        | Not Implemented |
+  | [[https://docs.python.org/2/library/functions.html#chr][*chr()*]]         | Same            | [[https://docs.python.org/2/library/functions.html#func-frozenset][*frozenset()*]] | Different       | [[https://docs.python.org/2/library/functions.html#long][*long()*]]       | Not Implemented | [[https://docs.python.org/2/library/functions.html#reload][*reload()*]]     | Not Implemented | [[https://docs.python.org/2/library/functions.html#vars][*vars()*]]           | Not Implemented |
+  | [[https://docs.python.org/2/library/functions.html#classmethod][*classmethod()*]] | Not Implemented | [[https://docs.python.org/2/library/functions.html#getattr][*getattr()*]]   | Same            | [[https://docs.python.org/2/library/functions.html#map][*map()*]]        | Same            | [[https://docs.python.org/2/library/functions.html#repr][*repr()*]]       | Same            | [[https://docs.python.org/2/library/functions.html#xrange][*xrange()*]]         | Not Implemented |
+  | [[https://docs.python.org/2/library/functions.html#cmp][*cmp()*]]         | Same            | [[https://docs.python.org/2/library/functions.html#globals][*globals()*]]   | Same            | [[https://docs.python.org/2/library/functions.html#max][*max()*]]        | Same            | [[https://docs.python.org/2/library/functions.html#reversed][*reversed()*]]   | Same            | [[https://docs.python.org/2/library/functions.html#zip][*zip()*]]            | Same            |
+  | [[https://docs.python.org/2/library/functions.html#compile][*compile()*]]     | Not Implemented | [[https://docs.python.org/2/library/functions.html#hasattr][*hasattr()*]]   | Same            | [[https://docs.python.org/2/library/functions.html#func-memoryview][*memoryview()*]] | Not Implemented | [[https://docs.python.org/2/library/functions.html#round][*round()*]]      | Same            | [[https://docs.python.org/2/library/functions.html#__import__][*\_\_import\_\_()*]] | Not Implemented |
+  | [[https://docs.python.org/2/library/functions.html#complex][*complex()*]]     | Not Implemented | [[https://docs.python.org/2/library/functions.html#hash][*hash()*]]      | Not Implemented | [[https://docs.python.org/2/library/functions.html#min][*min()*]]        | Same            | [[https://docs.python.org/2/library/functions.html#func-set][*set()*]]        | Not Implemented | [[https://docs.python.org/2/library/functions.html#apply][*apply()*]]          | Not Implemented |
+  | [[https://docs.python.org/2/library/functions.html#delattr][*delattr()*]]     | Same            | [[https://docs.python.org/2/library/functions.html#help][*help()*]]      | Not Implemented | [[https://docs.python.org/2/library/functions.html#next][*next()*]]       | Not Implemented | [[https://docs.python.org/2/library/functions.html#setattr][*setattr()*]]    | Same            | [[https://docs.python.org/2/library/functions.html#buffer][*buffer()*]]         | Not Implemented |
+  | [[https://docs.python.org/2/library/functions.html#func-dict][*dict()*]]        | Same            | [[https://docs.python.org/2/library/functions.html#hex][*hex()*]]       | Same            | [[https://docs.python.org/2/library/functions.html#object][*object()*]]     | Not Implemented | [[https://docs.python.org/2/library/functions.html#slice][*slice()*]]      | Same            | [[https://docs.python.org/2/library/functions.html#coerce][*coerce()*]]         | Not Implemented |
+  | [[https://docs.python.org/2/library/functions.html#dir][*dir()*]]         | Not Implemented | [[https://docs.python.org/2/library/functions.html#id][*id()*]]        | Same            | [[https://docs.python.org/2/library/functions.html#oct][*oct()*]]        | Same            | [[https://docs.python.org/2/library/functions.html#sorted][*sorted()*]]     | Same            | [[https://docs.python.org/2/library/functions.html#intern][*intern()*]]         | Not Implemented |
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  

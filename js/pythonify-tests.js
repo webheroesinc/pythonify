@@ -3,15 +3,16 @@
 
     console.log("Running tests...");
 
-    passes = 0
+    passes = 0;
     // Run tests
     function assert(condition, message) {
         if (!condition) {
-            throw message || "Assertion failed";
+            throw message || "Assertion failed: test "+passes+" | caught errors: "+caught_errors;
         }
-        passes++
+        passes++;
     }
 
+    caught_errors = 0;
     // Check error for expected failure
     function catch_error(callback, expected) {
         var error	= "";
@@ -22,9 +23,10 @@
             error	= err;
         }
         assert( error.startswith(expected) === true );
+        caught_errors++;
     }
     
-    // Test important funtions
+    // Test important functions
 
     // test dict.keys()
     var d	= { a:1, b:2 }
@@ -62,7 +64,7 @@
     assert( all([true, true]) === true )
     assert( all([true, false]) === false )
     assert( all({ one: true, two: true }) === true )
-    assert( all({ one: true, two: false }) === false )
+    assert( all({ one: true, two: false }) === true )
 
     // test all()
     assert( any([true, true]) === true )
@@ -70,7 +72,7 @@
     assert( any([false, false]) === false )
     assert( any({ one: true, two: true }) === true )
     assert( any({ one: true, two: false }) === true )
-    assert( any({ one: false, two: false }) === false )
+    assert( any({ one: false, two: false }) === true )
 
     // test bin()
     assert( bin(829) == "1100111101" )
@@ -194,11 +196,12 @@
     assert( isinstance(4, Number) === true )
     assert( isinstance("", String) === true )
     assert( isinstance(4, Number) === true )
-    assert( isinstance([], Object) === false )
+    assert( isinstance([], Object) === true )
+    assert( isinstance("", Object) === true )
+    assert( isinstance(4, Object) === true )
     assert( isinstance({}, Array) === false )
     assert( isinstance("4", Number) === false )
     assert( isinstance(4, String) === false )
-    assert( isinstance(4, Object) === false )
 
     // This doesn't truly subclass, rather than inheriting parent prototypes we are sharing a
     // prototype.  There must be a way to only inherit the parent prototype, perhaps with some sort
@@ -370,7 +373,7 @@
 
     // test dict.fromkeys()
     assert( len(dfk) == 2 )
-    assert( dfk.get('40001') == 1 )
+    assert( dfk['40001'] == 1 )
 
     // test string.in() and string.notIn() for dict
     assert( "plc".in(d) )
@@ -386,10 +389,10 @@
     assert( ! a.notIn([1]) )
     assert( b.notIn([1]) )
     
-    // test dict.get()
-    assert( d.get('plc', null) === "xxplc1" )
-    assert( d.get('nothing', 1) === 1 )
-    assert( d.get('nothing') === null )
+    // test dict.Get()
+    assert( d.Get('plc', null) === "xxplc1" )
+    assert( d.Get('nothing', 1) === 1 )
+    assert( d.Get('nothing') === null )
     assert( len(d) === 2 )
 
     // test dict.values()
@@ -701,7 +704,50 @@
     assert( "bill".zfill(8) == "0000bill" )
     assert( "-bill".zfill(8) == "-000bill" )
     
+    subclass( Array, {
+        grade: function() {
+            return "A+";
+        }
+    }, "Student");
+    window.sd	= Student();
 
+    // For super to work it need to return an object with the 
+    sd.extend(["a", "b", "c"])
+    // assert( Super( sd, "join", ["-"] ) === "a-b-c" )
+    // assert( Super( sd, "__repr__" ) === '["a","b","c"]' )
+
+
+    window.bubclass	= subclass( Array, {
+        bubble: function( txt ) {
+            return "Parent Bubble: "+txt;
+        }
+    }, "bubclass" );
+    window.subsubclass	= subclass( bubclass, {
+        bubble: function( txt ) {
+            return "Child Bubble: "+txt;
+        },
+        innerSuper: function( txt ) {
+            return Super( subsubclass, this ).bubble( txt );
+        }
+    }, "subsubclass" );
+
+    var s	= new bubclass()
+    var ss	= new subsubclass()
+
+    assert( Super(subsubclass, ss).bubble( "Hi" ) === "Parent Bubble: Hi" )
+    assert( ss.bubble( "Hi" ) === "Child Bubble: Hi" )
+    assert( ss.innerSuper( "Hi" ) === "Parent Bubble: Hi" )
+
+    assert( isinstance(s, bubclass) === true )
+    assert( isinstance(s, Array) === true )
+    assert( isinstance(s, subsubclass) === false )
+
+    assert( issubclass(bubclass, Array) === true )
+    assert( issubclass(subsubclass, bubclass) === true )
+    assert( issubclass(subsubclass, Array) === true )
+    assert( issubclass(subsubclass, subsubclass) === true )
+    assert( issubclass(bubclass, subsubclass) === false )
+    assert( issubclass(Array, bubclass) === false )
 
     console.log("Passed all "+passes+" tests");
 
@@ -716,5 +762,19 @@
     // });
     // range = iterrange(11, 30);
     // console.log(["range", range])
+
+    subclass( Array, {
+        __init__: function() {
+            
+        }
+    }, "Test");
+    subclass( Array, {
+        __init__: function() {
+            Test.call(this)
+        }
+    }, "Test");
+
+    // Super could clone the objects prototype methods into a wrapper and automatically call the
+    // same function within that wrapper using the .apply( this, arguments )
 
 })(window);
