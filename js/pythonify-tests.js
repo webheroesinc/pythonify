@@ -115,15 +115,41 @@
     assert( divmod(10,4)[1] === 2 )
     catch_error( function() { divmod() }, "TypeError: divmod() takes exactly" )
 
+    // test iterate()
+    var ls	= [];
+    iterate( [1,2], function(item) {
+        ls.push(item);
+    });
+    assert( ls[0] === 1 )
+    assert( ls[1] === 2 )
+    var ls	= [];
+    iterate( { a: null, b: null }, function(item) {
+        ls.push(item);
+    });
+    assert( ls[0] === "a" )
+    assert( ls[1] === "b" )
+
     // test enumerate()
-    var l	= enumerate( [1,2] );
-    assert( l[0].length === 2 )
-    assert( l[0][0] === 0 )
-    assert( l[0][1] === 1 )
-    var d	= enumerate( { a: null, b: null } );
-    assert( d[0].length === 2 )
-    assert( d[0][0] === 0 )
-    assert( d[0][1] === "a" )
+    var is	= [];
+    var ls	= [];
+    enumerate( [1,2], function(i, item) {
+        is.push(i);
+        ls.push(item);
+    });
+    assert( is[0] === 0 )
+    assert( is[1] === 1 )
+    assert( ls[0] === 1 )
+    assert( ls[1] === 2 )
+    var is	= [];
+    var ls	= [];
+    enumerate( { a: null, b: null }, function(i, item) {
+        is.push(i);
+        ls.push(item);
+    });
+    assert( is[0] === 0 )
+    assert( is[1] === 1 )
+    assert( ls[0] === "a" )
+    assert( ls[1] === "b" )
 
     // test filter()
     var d	= { a: true, b: false }
@@ -340,6 +366,10 @@
     // test str()
     assert( str({a:1,b:2}) == '{"a":1,"b":2}' )
     assert( str([1,2,3,4,5]) == '[1,2,3,4,5]' )
+    assert( str(tuple([1,2,3,4,5])) == '(1,2,3,4,5)' )
+    assert( str(str) == '<function str>' )
+    assert( str(null) == 'None' )
+    assert( str(undefined) == 'Undefined' )
 
     // test sum()
     assert( sum([1,2,3,4]) == 10 )
@@ -712,7 +742,7 @@
     assert( "bill".zfill(8) == "0000bill" )
     assert( "-bill".zfill(8) == "-000bill" )
     
-    subclass( Array, {
+    window.Student = subclass( Array, {
         grade: function() {
             return "A+";
         }
@@ -793,18 +823,18 @@
     for( name in keys(dnames) ) {
         //console.log(name);
     }
-
-    subclass( Array, {
+    
+    window.Test = subclass( Array, {
         __init__: function() {
             dnames.iteritems(function(k,v,t) {
-                console.log(str(this), k,v,str(t));
+                //console.log(str(this), k,v,str(t));
             });
             dnames.iteritems(function(k,v,t) {
-                console.log(str(this), k,v,str(t));
+                //console.log(str(this), k,v,str(t));
             }, this);
         }
-    }, "Test");
-    subclass( Test, {
+    });
+    window.SubTest = subclass( Test, {
         __init__: function() {
             Super(SubTest, this).__init__()
             // Test.call(this); // This is equivalent to the line above.

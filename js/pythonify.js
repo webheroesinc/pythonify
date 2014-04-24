@@ -5,18 +5,18 @@
     // Function
     // String
 
-    window.is_complex = function(obj) {
+    window.is_complex = function is_complex(obj) {
         return is_dict(obj) || is_list(obj) || is_window(obj) ? true : false;
     }
 
-    window.is_window = function(obj) {
+    window.is_window = function is_window(obj) {
         window.asdfghjkl = true;
         var answer	= obj.asdfghjkl === true
         delete window.asdfghjkl;
         return answer;
     }
 
-    window.is_dict = function(obj) {
+    window.is_dict = function is_dict(obj) {
         if( obj.callee !== undefined ) {
             return false;
         }
@@ -27,21 +27,21 @@
         return false
     }
 
-    window.is_list = function(array) {
+    window.is_list = function is_list(array) {
         if( Array.isArray(array) ) {
             return true
         }
         return false
     }
 
-    window.is_tuple = function(t) {
+    window.is_tuple = function is_tuple(t) {
         if( isinstance(t, tuple) && Object.isFrozen(t) ) {
             return true
         }
         return false
     }
 
-    window.is_iterable = function(iter) {
+    window.is_iterable = function is_iterable(iter) {
         if( iter.length !== undefined && typeof iter !== 'string' ) {
             return true
         }
@@ -141,10 +141,10 @@
     }
     window.dict		= dict
 
-    window.abs = function(x) {
+    window.abs = function abs(x) {
         return Math.abs(x);
     }
-    window.all = function(iter) {
+    window.all = function all(iter) {
         var sequence	= is_dict(iter) ? iter.keys() : iter;
         for( var i in sequence ) {
             if( ! sequence[i] ) {
@@ -153,7 +153,7 @@
         }
         return true;
     }
-    window.any = function(iter) {
+    window.any = function any(iter) {
         var sequence	= is_dict(iter) ? iter.keys() : iter;
         for( var i in sequence ) {
             if( sequence[i] ) {
@@ -162,16 +162,16 @@
         }
         return false;
     }
-    window.bin = function(x) {
+    window.bin = function bin(x) {
         return x.toString(2)
     }
-    window.bool = function(x) {
+    window.bool = function bool(x) {
         return x ? true : false;
     }
-    window.callable = function(obj) {
+    window.callable = function callable(obj) {
         return typeof obj === "function" ? true : false;
     }
-    window.chr = function(i) {
+    window.chr = function chr(i) {
         if( i >= 0 && i < 256 ) {
             return String.fromCharCode(i);
         }
@@ -179,35 +179,34 @@
             throw "ValueError: chr() arg not in range(256)";
         }
     }
-    window.cmp = function(x,y) {
+    window.cmp = function cmp(x,y) {
         return x < y ? -1 : x === y ? 0 : x > y ? 1 : null;
     }
     // window.compile:	Not sure if Javascript can do this
     // window.complex:	mathjs.org does this
-    window.delattr = function(obj, name) {
+    window.delattr = function delattr(obj, name) {
         if( arguments.length !== 2 ) {
             throw "TypeError: delattr() takes exactly two argument ("+arguments.length+" given)"
         }
         delete obj[name];
     }
     // window.dir:	Not sure if you can iterate over hidden properties
-    window.divmod = function(a,b) {
+    window.divmod = function divmod(a,b) {
         if( arguments.length !== 2 ) {
             throw "TypeError: divmod() takes exactly two argument ("+arguments.length+" given)";
         }
         return [Math.floor(a/b), a % b];
     }
-    window.enumerate = function(sequence, start) {
-        var results	= [];
-        var sequence	= is_dict(sequence) ? sequence.keys() : sequence;
-        var start	= start === undefined ? 0 : start;
-        for( var i=start; i < sequence.length; i++ ) {
-            results.append( [i, sequence[i]] );
-        }
-        return results;
+    window.iterate = function iterate(iter, callback, scope) {
+        var sequence	= is_dict(iter) ? iter.keys() : iter;
+        sequence.iterate( callback, scope );
+    }
+    window.enumerate = function enumerate(iter, callback, scope, start) {
+        var sequence	= is_dict(iter) ? iter.keys() : iter;
+        sequence.enumerate( callback, scope, start );
     }
     // window.eval:	Figure out a way to make eval ONLY handle expressions
-    window.filter = function(callback, iter) {
+    window.filter = function filter(callback, iter) {
         var results	= [];
         var sequence	= is_dict(iter) ? iter.keys() : iter;
         for( var i=0; i < sequence.length; i++ ) {
@@ -219,16 +218,16 @@
         return results;
     }
     // window.format:	Later...
-    window.frozenset = function(iter) {
+    window.frozenset = function frozenset(iter) {
         var sequence	= is_dict(iter)
             ? iter.keys()
             : iter.copy();
         return Object.freeze(sequence);
     }
-    window.float = function(x) {
+    window.float = function float(x) {
         return parseFloat(x);
     }
-    window.getattr = function(obj, name, dflt) {
+    window.getattr = function getattr(obj, name, dflt) {
         if( arguments.length < 2 ) {
             throw "TypeError: getattr() takes at least two argument ("+arguments.length+" given)";
         }
@@ -242,10 +241,10 @@
         }
         return obj[name];
     }
-    window.globals = function() {
+    window.globals = function globals() {
         return window;
     }
-    window.hasattr = function(obj, name) {
+    window.hasattr = function hasattr(obj, name) {
         if( arguments.length < 2 ) {
             throw "TypeError: hasattr() takes at least two argument ("+arguments.length+" given)";
         }
@@ -253,23 +252,23 @@
     }
     // window.hash:	Not sure what python's hash does
     // window.help:	??? possibly N/A
-    window.hex = function(n) {
+    window.hex = function hex(n) {
         return (n < 0 ? "-" : "") + "0x"+abs(n).toString(16);
     }
     // This isn't working as nicely as I could like.
-    window.id = function(obj) {
+    window.id = function id(obj) {
         return obj.__id__();
     }
-    window.input = function(text) {
+    window.input = function input(text) {
         return eval(prompt(text));
     }
-    window.raw_input = function(text) {
+    window.raw_input = function raw_input(text) {
         return prompt(text);
     }
-    window.int = function(x, base) {
+    window.int = function int(x, base) {
         return x === undefined ? 0 : base === undefined ? parseInt(x) : parseInt(x).toString(base);
     }
-    window.isinstance = function(obj, classinfo) {
+    window.isinstance = function isinstance(obj, classinfo) {
         if( is_window(obj) )
             return false;
         if( obj instanceof classinfo )
@@ -278,10 +277,10 @@
             return true;
         return false;
     }
-    window.issubclass = function(cls, classinfo) {
+    window.issubclass = function issubclass(cls, classinfo) {
         return new cls instanceof classinfo;
     }
-    window.iter = function(o, sentinel) {
+    window.iter = function iter(o, sentinel) {
         if( sentinel === undefined ) {
             return is_dict(o)
                 ? o.keys()
@@ -299,7 +298,7 @@
     }
     // window.locals:	??? would be the same as globals
     // window.long:	??? would be the same as int
-    window.map = function(callback) {
+    window.map = function map(callback) {
         if( len(arguments) < 2 ) {
             throw "TypeError: map() takes at least two arguments ("+arguments.length+" given)";
         }
@@ -332,7 +331,7 @@
         }
         return result;
     }
-    window.max = function() {
+    window.max = function max() {
         var key		= undefined;
         var sequence	= new Array().slice.apply(arguments);
         if( callable( arguments[arguments.length-1] ) ) {
@@ -355,7 +354,7 @@
         }
         return match;
     }
-    window.min = function() {
+    window.min = function min() {
         var key		= undefined;
         var sequence	= new Array().slice.apply(arguments);
         if( callable( arguments[arguments.length-1] ) ) {
@@ -379,14 +378,14 @@
         return match;
     }
     // window.next:	Need to implement iterators/generators better
-    window.object = function(n) {
+    window.object = function object(n) {
         return new Object();
     }
-    window.oct = function(n) {
+    window.oct = function oct(n) {
         return (n < 0 ? "-" : "") + "0"+abs(n).toString(8);
     }
     // window.open:	No file handling
-    window.ord = function(i) {
+    window.ord = function ord(i) {
         if( i.length === 1 ) {
             return i.charCodeAt(0);
         }
@@ -394,10 +393,10 @@
             throw "TypeError: ord() expected a character, but string of length "+i.length+" found";
         }
     }
-    window.pow = function(x, y, z) {
+    window.pow = function pow(x, y, z) {
         return z === undefined ? Math.pow(x, y) : Math.pow(x, y) % z;
     }
-    window.range = function() {
+    window.range = function range() {
         if( len(arguments) === 0 ) {
             throw "TypeError: range() takes at least one argument ("+arguments.length+" given)";
         }
@@ -428,7 +427,7 @@
         return r;
     }
     // window.print:	??? What to do for print?
-    window.reduce = function(callback, iter, initializer) {
+    window.reduce = function reduce(callback, iter, initializer) {
         if( len(iter) === 0 && initializer === undefined ) {
             throw "reduce() of empty sequence with no initial value";
         }
@@ -441,28 +440,28 @@
         return accum_value;
     }
     // window.reload:	No concept for modules yet
-    window.repr = function(obj) {
+    window.repr = function repr(obj) {
         return obj.__repr__ === undefined ? obj.toString() : obj.__repr__();
     }
-    window.reversed = function(iter) {
+    window.reversed = function reversed(iter) {
         if( iter.__reversed__ === undefined ) {
             throw "TypeError: argument to reversed() must be a sequence";
         }
         return iter.__reversed__();
     }
-    window.round = function(n, ndigits) {
+    window.round = function round(n, ndigits) {
         var modifier	= pow(10, ndigits === undefined ? 0 : ndigits );
         return Math.round(n*modifier)/modifier;
     }
     // window.set:	Later...
-    window.setattr = function(obj, name, value) {
+    window.setattr = function setattr(obj, name, value) {
         if( arguments.length !== 3 ) {
             throw "TypeError: setattr() takes exactly three arguments ("+arguments.length+" given)";
         }
         obj[name] = value;
     }
     // window.slice:	Seems kinda useless, look into some examples
-    window.sorted = function(iter, cmp, key, reverse) {
+    window.sorted = function sorted(iter, cmp, key, reverse) {
         if( arguments.length === 0 ) {
             throw "TypeError: sorted() takes at least one argument (0 given)";
         }
@@ -494,12 +493,14 @@
         }
         return result;
     }
-    window.str = function(obj) {
+    window.str = function str(obj) {
         if( obj === undefined )
-            return '';
+            return 'Undefined';
+        if( obj === null )
+            return 'None';
         return obj.__str__ === undefined ? obj.toString() : obj.__str__();
     }
-    window.sum = function(iter, start) {
+    window.sum = function sum(iter, start) {
         if( arguments.length === 0 )
             throw "TypeError: sum() takes at least one argument (0 given)";
         if( arguments.length > 2 )
@@ -515,7 +516,7 @@
 
         return total;
     }
-    window.Super = function(classinfo, obj) {
+    window.Super = function Super(classinfo, obj) {
         if( ! isinstance(obj, classinfo) ) {
             throw "obj must be an instance of classinfo";
         }
@@ -547,7 +548,7 @@
         window.__clones__[id(parent)] = clone;
         return new clone();
     }
-    window.type = function(obj) {
+    window.type = function type(obj) {
         if( obj === undefined )
             throw "TypeError: type() takes exactly one argument ("+arguments.length+" given)";
         if( is_tuple(obj) ) {
@@ -559,7 +560,7 @@
     // window.unicode	Not implementing unicode things
     // window.vars	Later...
     // window.xrange	Later...
-    window.zip = function() {
+    window.zip = function zip() {
         var ziplist	= [];
         var minlen	= min( map( function(x) { return len(x) }, arguments ) );
         for( var a=0; a < minlen; a++ ) {
@@ -572,14 +573,14 @@
         }
         return ziplist;
     }
-    window.subclass = function(classinfo, methods, name, namespace) {
+    window.subclass = function subclass(classinfo, methods, name) {
         if( arguments.length === 0 )
             throw "TypeError: subclass() takes at least one argument (0 given)";
         if( methods !== undefined && methods !== null && ! is_dict(methods) )
             throw "TypeError: methods must be a dict object";
 
         var init_func	=
-            (name ? "function "+name : "var __tmpclass = function")+"() {\
+            "var __tmpclass = function"+(name ? " "+name : "" )+"() {\
             \n    if( isinstance( this, "+(name || "__tmpclass")+" ) ) {\
             \n        return methods.__init__ === undefined\
             \n            ? this\
@@ -588,7 +589,7 @@
             \n    else {\
             \n        return new "+(name || "__tmpclass")+"();\
             \n    }\
-            \n};" + (name ? " var __tmpclass = "+name+";" : "");
+            \n};";
 
         eval( init_func );
 
@@ -596,8 +597,6 @@
 
         if( name !== undefined ) {
             methods.__name__			= name;
-            namespace				= namespace === undefined ? window : namespace;
-            namespace[name]			= __tmpclass;
         }
         
         methods.constructor	= __tmpclass;
@@ -615,6 +614,14 @@
     }
     
 
+    Object.defineProperties( Function.prototype, {
+        "__repr__": {
+            writable: true,
+            value: function() {
+                return "<function "+(this.name === "" ? "anonymous" : this.name)+">";
+            }
+        }
+    });
     
     Object.defineProperties( Array.prototype, {
         "append": {
@@ -675,6 +682,22 @@
             writable: true,
             value: function() {
                 return this.slice();
+            }
+        },
+        "iterate": {
+            writable: true,
+            value: function(callback, scope) {
+                for( i in this ) {
+                    callback.call(scope || this, this[i]);
+                }
+            }
+        },
+        "enumerate": {
+            writable: true,
+            value: function(callback, scope, start) {
+                for( var i=(start || 0); i < this.length; i++ ) {
+                    callback.call(scope || this, i, this[i]);
+                }
             }
         },
         "__str__": {
