@@ -135,6 +135,9 @@ SubTest = subclass( Test, {
         // do setup things...
     }
 }, "SubTest");
+
+str(Test)	// returns "<function anonymous>"
+str(SubTest)	// returns "<function SubTest>"
     #+END_SRC
 
   
@@ -151,11 +154,10 @@ SubTest = subclass( Test, {
    | [[https://docs.python.org/2/library/stdtypes.html#dict.setdefault][setdefault]] | Same      |
    | [[https://docs.python.org/2/library/stdtypes.html#dict.update][update]]     | Same      |
    | [[https://docs.python.org/2/library/stdtypes.html#dict.values][values]]     | Same      |
-   | join       | New       |
 
 *** get(key, default=None)
 
-    Having a *get* method on any object ruins the ability to use *Object.definePropert[y|ies]* for
+    Having a *get* method on any object ruins the ability to use ~Object.definePropert[y|ies]~ for
     that method's properties.  To avoid this we renamed it to *Get* with an uppercase *g*.
 
 *** items()
@@ -179,16 +181,17 @@ d.items(function(key, value) {
 
 ** Data Structures -- [[https://docs.python.org/2/tutorial/datastructures.html][list]]
 
-   | append  | Same |
-   | extend  | Same |
-   | insert  | Same |
-   | remove  | Same |
-   | pop     | Same |
-   | index   | Same |
-   | count   | Same |
-   | sort    | Same |
-   | reverse | Same |
-   | iterate | New  | 
+   | append    | Same |
+   | extend    | Same |
+   | insert    | Same |
+   | remove    | Same |
+   | pop       | Same |
+   | index     | Same |
+   | count     | Same |
+   | sort      | Same |
+   | reverse   | Same |
+   | [[#iterate-callback-scope-][iterate]]   | New  |
+   | [[#enumerate-callback-scope-start-][enumerate]] | New  |
 
 *** iterate( callback, scope )
 

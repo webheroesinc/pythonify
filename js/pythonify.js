@@ -924,7 +924,8 @@
         "join": {
             writable: true,
             value: function( iter ) {
-                return iter.join( this );
+                var sequence = is_dict(iter) ? iter.keys() : iter;
+                return sequence.join( this );
             }
         },
         "ljust": {
@@ -1237,12 +1238,6 @@
                     values.push( this[keys[i]] )
                 }
                 return values;
-            }
-        },
-        "join": {
-            writable: true,
-            value: function( str ) {
-                return this.keys().join( str );
             }
         },
         "__id__": {
