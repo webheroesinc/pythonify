@@ -172,6 +172,8 @@
     var num	= 4;
     assert( id(d) === d.__id__() )
     assert( id(d) === id(d) )
+    d.____id	= -1
+    assert( id(d) !== -1 )
     assert( id(l) === id(l) )
     assert( id(d) != id(d2) )
     assert( id(l) != id(l2) )
@@ -400,6 +402,12 @@
 
     // test dict.items()
     assert( len(d.items()) == 2 )
+
+    // The problem with this is that the scope of 'this' would be the window inside of that
+    // function.
+    d.items(function( key, value ) {
+        
+    });
 
     // test dict.clear() and dict.copy()
     d2 = d.copy()
@@ -763,18 +771,49 @@
     // range = iterrange(11, 30);
     // console.log(["range", range])
 
+    function convert( iter ) {
+        return dict.fromkeys(iter);
+    }
+    function values( iter ) {
+        return convert(iter.values());
+    }
+    function keys( iter ) {
+        return iter;
+    }
+
+    var lnames	= ['Travis', 'Matthew'];
+    var dnames	= { first: "Travis", last: "Mottershead" };
+    for( name in convert(lnames) ) {
+        //console.log(name);
+    }
+
+    for( name in values(dnames) ) {
+        //console.log(name);
+    }
+    for( name in keys(dnames) ) {
+        //console.log(name);
+    }
+
     subclass( Array, {
         __init__: function() {
-            
+            dnames.iteritems(function(k,v,t) {
+                console.log(str(this), k,v,str(t));
+            });
+            dnames.iteritems(function(k,v,t) {
+                console.log(str(this), k,v,str(t));
+            }, this);
         }
     }, "Test");
-    subclass( Array, {
+    subclass( Test, {
         __init__: function() {
-            Test.call(this)
+            Super(SubTest, this).__init__()
+            // Test.call(this); // This is equivalent to the line above.
         }
-    }, "Test");
+    }, "SubTest");
 
     // Super could clone the objects prototype methods into a wrapper and automatically call the
     // same function within that wrapper using the .apply( this, arguments )
+
+    
 
 })(window);

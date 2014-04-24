@@ -5,15 +5,6 @@
     // Function
     // String
 
-    function extend(x, y) {
-        for(var key in y) {
-            if (y.hasOwnProperty(key)) {
-                x[key] = y[key];
-            }
-        }
-        return x;
-    }
-
     window.is_complex = function(obj) {
         return is_dict(obj) || is_list(obj) || is_window(obj) ? true : false;
     }
@@ -43,6 +34,13 @@
         return false
     }
 
+    window.is_tuple = function(t) {
+        if( isinstance(t, tuple) && Object.isFrozen(t) ) {
+            return true
+        }
+        return false
+    }
+
     window.is_iterable = function(iter) {
         if( iter.length !== undefined && typeof iter !== 'string' ) {
             return true
@@ -67,9 +65,34 @@
     window.len		= len
 
     function tuple(iter) {
+        if( ! isinstance(this, tuple) ) {
+            return new tuple(iter);
+        }
         var sequence	= is_dict(iter) ? iter.keys() : iter.copy();
-        return Object.freeze(sequence)
+        for( i in sequence ) {
+            this.append(sequence[i]);
+        }
+        Object.freeze(this);
     }
+    tuple.prototype		= new Array();
+    Object.defineProperties( tuple.prototype, {
+        constructor: {
+            writable: true,
+            value: tuple
+        },
+        __str__: {
+            writable: true,
+            value: function() {
+                return this.__repr__();
+            }
+        },
+        __repr__: {
+            writable: true,
+            value: function() {
+                return '('+map(function(x) { return str(x) }, this).join(",")+')';
+            }
+        }
+    });
     window.tuple	= tuple
 
     function list() {
@@ -283,7 +306,15 @@
         var iterlist	= [];
         for( var i=1; i < arguments.length; i++ ) {
             var arg	= arguments[i];
-            iterlist.append( is_dict(arg) ? arg.keys() : new Array().slice.apply(arg) );
+            if( is_dict(arg) ) {
+                iterlist.append( arg.keys() );
+            }
+            // else if( is_tuple(arg) ) {
+            //     iterlist.append( arg );
+            // }
+            else {
+                iterlist.append( new Array().slice.apply(arg) );
+            }
         }
         var exhausted	= false;
         var result	= [];
@@ -519,7 +550,7 @@
     window.type = function(obj) {
         if( obj === undefined )
             throw "TypeError: type() takes exactly one argument ("+arguments.length+" given)";
-        if( is_list(obj) && Object.isFrozen(obj) ) {
+        if( is_tuple(obj) ) {
             return "Tuple";
         }
         return obj.constructor.name;
@@ -546,24 +577,39 @@
             throw "TypeError: subclass() takes at least one argument (0 given)";
         if( methods !== undefined && methods !== null && ! is_dict(methods) )
             throw "TypeError: methods must be a dict object";
-        
-        methods		= methods !== undefined && methods !== null ? methods : {};
-        if( methods.__init__ === undefined ) {
-            methods.__init__			= function() {
-                return isinstance( this, __tmpclass ) ? this : new __tmpclass();
-            }
-        }
-        var __tmpclass	= methods.__init__ || function() {};
-        __tmpclass.prototype			= new classinfo();
-        __tmpclass.prototype.__parent__		= classinfo;
-        for( key in methods ) {
-            __tmpclass.prototype[key]	= methods[key];
-        }
+
+        var init_func	=
+            (name ? "function "+name : "var __tmpclass = function")+"() {\
+            \n    if( isinstance( this, "+(name || "__tmpclass")+" ) ) {\
+            \n        return methods.__init__ === undefined\
+            \n            ? this\
+            \n            : methods.__init__.apply(this, arguments);\
+            \n    }\
+            \n    else {\
+            \n        return new "+(name || "__tmpclass")+"();\
+            \n    }\
+            \n};" + (name ? " var __tmpclass = "+name+";" : "");
+
+        eval( init_func );
+
+        __tmpclass.prototype	= new classinfo();
+
         if( name !== undefined ) {
-            __tmpclass.prototype.__name__	= name;
+            methods.__name__			= name;
             namespace				= namespace === undefined ? window : namespace;
             namespace[name]			= __tmpclass;
         }
+        
+        methods.constructor	= __tmpclass;
+        methods.__parent__	= classinfo;
+        props			= {};
+        for( key in methods || {} ) {
+            props[key]	= {
+                writable: true,
+                value: methods[key]
+            }
+        }
+        Object.defineProperties( __tmpclass.prototype, props );
 
         return __tmpclass;
     }
@@ -1095,9 +1141,20 @@
                 var items 	= []
                 , keys		= this.keys()
                 for( var i=0; i<keys.length; i++ ) {
-                    items.push( [ keys[i], this[keys[i]] ] )
+                    var item	= tuple([ keys[i], this[keys[i]] ]);
+                    items.push( item );
                 }
                 return items;
+            }
+        },
+        "iteritems": {
+            writable: true,
+            value: function(callback, scope) {
+                var keys	= this.keys();
+                for( var i=0; i<keys.length; i++ ) {
+                    var t	= tuple([keys[i], this[keys[i]]])
+                    callback.call( scope || this, t[0], t[1], t );
+                }
             }
         },
         "keys": {
@@ -1173,7 +1230,6 @@
                 }
                 if( this.____id === undefined ) {
                     Object.defineProperty( this, "____id", {
-                        writable: true,
                         value: ++window.__id
                     });
                 }
