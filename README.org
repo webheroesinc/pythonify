@@ -1,0 +1,291 @@
+#+TITLE: Pythonify.js
+#+STYLE: <link rel="stylesheet" type="text/css" href="org.css" />
+
+* Overview
+
+  *Mission*
+
+  The goal of this library is to:
+
+  1. Create useful and efficient methods for JavaScript based on the methodologies that the Python
+     language is built on.
+  2. Stay true to the native JavaScript concepts and to deviate as little as possible from these
+     concepts.
+  3. Be light weight and straight forward.  We want as little /magic/ as possible happening in the
+     background.
+
+  *Why Python?*
+
+  Python is mostly well known and has a plethora of well thought out implementations and methods.
+  The advantages of trying to make things that are the same as in Python is to hopefully avoid
+  learning two ways to accomplish the same result.
+
+
+** Built-in Functions
+
+   - *Same* - JavaScript method can be used the same as the Python method.
+   - *Different* - Because of JavaScript limitations or differences the method could not be
+     implemented the same way that it is in Python.  Either the method name, method args and/or the
+     returned data is not the same as the Python method.
+   - *Not Implemented* - Has not been written yet.
+ 
+   | [[https://docs.python.org/2/library/functions.html#abs][abs()]]         | Same            | [[https://docs.python.org/2/library/functions.html#divmod][divmod()]]    | Same            | [[https://docs.python.org/2/library/functions.html#input][input()]]      | Same            | [[https://docs.python.org/2/library/functions.html#open][open()]]      | Not Implemented | [[https://docs.python.org/2/library/functions.html#staticmethod][staticmethod()]] | Not Implemented |
+   | [[https://docs.python.org/2/library/functions.html#all][all()]]         | Same            | [[https://docs.python.org/2/library/functions.html#enumerate][enumerate()]] | [[#enumerate-list-callback-scope-start-][Different]]       | [[https://docs.python.org/2/library/functions.html#int][int()]]        | Same            | [[https://docs.python.org/2/library/functions.html#ord][ord()]]       | Same            | [[https://docs.python.org/2/library/functions.html#str][str()]]          | Same            |
+   | [[https://docs.python.org/2/library/functions.html#any][any()]]         | Same            | [[https://docs.python.org/2/library/functions.html#eval][eval()]]      | [[#eval][Different]]       | [[https://docs.python.org/2/library/functions.html#isinstance][isinstance()]] | Different       | [[https://docs.python.org/2/library/functions.html#pow][pow()]]       | Same            | [[https://docs.python.org/2/library/functions.html#sum][sum()]]          | Same            |
+   | [[https://docs.python.org/2/library/functions.html#basestring][basestring()]]  | Not Implemented | [[https://docs.python.org/2/library/functions.html#execfile][execfile()]]  | Not Implemented | [[https://docs.python.org/2/library/functions.html#issubclass][issubclass()]] | Different       | [[https://docs.python.org/2/library/functions.html#print][print()]]     | Not Implemented | [[https://docs.python.org/2/library/functions.html#super][super()]]        | [[#super][Different]]       |
+   | [[https://docs.python.org/2/library/functions.html#bin][bin()]]         | Same            | [[https://docs.python.org/2/library/functions.html#file][file()]]      | Not Implemented | [[https://docs.python.org/2/library/functions.html#iter][iter()]]       | Different       | [[https://docs.python.org/2/library/functions.html#property][property()]]  | Not Implemented | [[https://docs.python.org/2/library/functions.html#tuple][tuple()]]        | Same            |
+   | [[https://docs.python.org/2/library/functions.html#bool][bool()]]        | Same            | [[https://docs.python.org/2/library/functions.html#filter][filter()]]    | Same            | [[https://docs.python.org/2/library/functions.html#len][len()]]        | Same            | [[https://docs.python.org/2/library/functions.html#range][range()]]     | Same            | [[https://docs.python.org/2/library/functions.html#type][type()]]         | Same            |
+   | [[https://docs.python.org/2/library/functions.html#bytearray][bytearray()]]   | Not Implemented | [[https://docs.python.org/2/library/functions.html#float][float()]]     | Same            | [[https://docs.python.org/2/library/functions.html#list][list()]]       | Same            | [[https://docs.python.org/2/library/functions.html#raw_input][raw_input()]] | Same            | [[https://docs.python.org/2/library/functions.html#unichr][unichr()]]       | Not Implemented |
+   | [[https://docs.python.org/2/library/functions.html#callable][callable()]]    | Same            | [[https://docs.python.org/2/library/functions.html#format][format()]]    | Same            | [[https://docs.python.org/2/library/functions.html#locals][locals()]]     | Not Implemented | [[https://docs.python.org/2/library/functions.html#reduce][reduce()]]    | Same            | [[https://docs.python.org/2/library/functions.html#unicode][unicode()]]      | Not Implemented |
+   | [[https://docs.python.org/2/library/functions.html#chr][chr()]]         | Same            | [[https://docs.python.org/2/library/functions.html#func-frozenset][frozenset()]] | [[#frozenset][Different]]       | [[https://docs.python.org/2/library/functions.html#long][long()]]       | Not Implemented | [[https://docs.python.org/2/library/functions.html#reload][reload()]]    | Not Implemented | [[https://docs.python.org/2/library/functions.html#vars][vars()]]         | Not Implemented |
+   | [[https://docs.python.org/2/library/functions.html#classmethod][classmethod()]] | Not Implemented | [[https://docs.python.org/2/library/functions.html#getattr][getattr()]]   | Same            | [[https://docs.python.org/2/library/functions.html#map][map()]]        | Same            | [[https://docs.python.org/2/library/functions.html#repr][repr()]]      | Same            | [[https://docs.python.org/2/library/functions.html#xrange][xrange()]]       | Not Implemented |
+   | [[https://docs.python.org/2/library/functions.html#cmp][cmp()]]         | Same            | [[https://docs.python.org/2/library/functions.html#globals][globals()]]   | Same            | [[https://docs.python.org/2/library/functions.html#max][max()]]        | Same            | [[https://docs.python.org/2/library/functions.html#reversed][reversed()]]  | Same            | [[https://docs.python.org/2/library/functions.html#zip][zip()]]          | Same            |
+   | [[https://docs.python.org/2/library/functions.html#compile][compile()]]     | Not Implemented | [[https://docs.python.org/2/library/functions.html#hasattr][hasattr()]]   | Same            | [[https://docs.python.org/2/library/functions.html#func-memoryview][memoryview()]] | Not Implemented | [[https://docs.python.org/2/library/functions.html#round][round()]]     | Same            | [[https://docs.python.org/2/library/functions.html#__import__][__import__()]]   | Not Implemented |
+   | [[https://docs.python.org/2/library/functions.html#complex][complex()]]     | Not Implemented | [[https://docs.python.org/2/library/functions.html#hash][hash()]]      | Not Implemented | [[https://docs.python.org/2/library/functions.html#min][min()]]        | Same            | [[https://docs.python.org/2/library/functions.html#func-set][set()]]       | Not Implemented | [[https://docs.python.org/2/library/functions.html#apply][apply()]]        | Not Implemented |
+   | [[https://docs.python.org/2/library/functions.html#delattr][delattr()]]     | Same            | [[https://docs.python.org/2/library/functions.html#help][help()]]      | Not Implemented | [[https://docs.python.org/2/library/functions.html#next][next()]]       | Not Implemented | [[https://docs.python.org/2/library/functions.html#setattr][setattr()]]   | Same            | [[https://docs.python.org/2/library/functions.html#buffer][buffer()]]       | Not Implemented |
+   | [[https://docs.python.org/2/library/functions.html#func-dict][dict()]]        | Same            | [[https://docs.python.org/2/library/functions.html#hex][hex()]]       | Same            | [[https://docs.python.org/2/library/functions.html#object][object()]]     | Different       | [[https://docs.python.org/2/library/functions.html#slice][slice()]]     | Same            | [[https://docs.python.org/2/library/functions.html#coerce][coerce()]]       | Not Implemented |
+   | [[https://docs.python.org/2/library/functions.html#dir][dir()]]         | Not Implemented | [[https://docs.python.org/2/library/functions.html#id][id()]]        | Same            | [[https://docs.python.org/2/library/functions.html#oct][oct()]]        | Same            | [[https://docs.python.org/2/library/functions.html#sorted][sorted()]]    | Same            | [[https://docs.python.org/2/library/functions.html#intern][intern()]]       | Not Implemented |
+
+*** eval
+
+    This is a native function in JavaScript.  The Python *eval* can only evaluate expressions where
+    as the JavaScript *eval* can evaluate any JavaScript code.
+
+*** frozenset
+
+    Currently this acts like a tuple rather than a set.
+
+*** super
+
+    *super* is a reserved word in JavaScript so we had to rename it to *Super* with an uppercase *s*.
+   
+*** enumerate( list, callback, scope, start )
+
+    Takes a list and calls it's *enumerate* method giving it the callback and scope.  Same as:
+    ~list.enumerate( callback, scope, start )~
+
+
+** New Built-in Functions
+   
+*** iterate( list, callback, scope )
+
+    Takes a list and calls it's *iterate* method giving it the callback and scope.  Same as: ~list.iterate( callback, scope )~
+
+
+    *Iterating Tricks*
+
+    You can turn a list into a dict using the list items as the keys with the *dict.fromkeys()*
+    method.  So that when you use that dict in a for loop you get the list items as the index
+    instead of the list index.
+
+    *Warning:* Changing the list items to be keys in a dict will convert every item to a string.  If
+     the list contains complex objects or numbers that need to remain type number, use the iterate
+     methods.
+    
+    #+BEGIN_SRC javascript
+for( name in dict.fromkeys(['Mark', 'Wahlberg']) ) {
+    console.log(name);
+}
+// -- Outputs --
+// Mark
+// Wahlberg
+    #+END_SRC
+
+*** is_window(obj)
+    
+    Checks if object is the *window* object.
+
+*** is_complex(obj)
+    
+    Checks if object is a *dict* or *list* object.
+    
+*** is_dict(obj)
+    
+    Checks if object is a *dict* object.
+
+*** is_list(obj)
+
+    Checks if object is a *list* object.
+
+*** is_tuple(obj)
+
+    Checks if object is a *tuple* object.
+
+*** is_iterable(obj)
+
+    Checks if object is a *dict*, *list* or *string* object.
+
+*** subclass( classinfo, methods, name )
+
+    Makes and returns an Object properly sub classed from the given *classinfo* with all the
+    *methods* as properties.  Each property is set to be writable and *NOT* enumerable or
+    configurable.  Optionally a class name can be given.  Specifying a class name will only affect
+    the way the object is printed when using *str* or *repr*.
+
+    #+BEGIN_SRC javascript
+Test = subclass( Array, {
+    __init__: function() {
+        // do setup things...
+    }
+});
+SubTest = subclass( Test, {
+    __init__: function() {
+        Super(SubTest, this).__init__()
+        // do setup things...
+    }
+}, "SubTest");
+
+str(Test)	// returns "<function anonymous>"
+str(SubTest)	// returns "<function SubTest>"
+    #+END_SRC
+
+  
+** Mapping Types -- [[https://docs.python.org/2/library/stdtypes.html#dict][dict]]
+
+   | [[https://docs.python.org/2/library/stdtypes.html#dict.clear][clear]]      | Same      |
+   | [[https://docs.python.org/2/library/stdtypes.html#dict.copy][copy]]       | Same      |
+   | [[https://docs.python.org/2/library/stdtypes.html#dict.fromkeys][fromkeys]]   | Same      |
+   | [[https://docs.python.org/2/library/stdtypes.html#dict.get][get]]        | [[#getkey-defaultnone][Different]] |
+   | [[https://docs.python.org/2/library/stdtypes.html#dict.items][items]]      | [[#items][Different]] |
+   | [[https://docs.python.org/2/library/stdtypes.html#dict.keys][keys]]       | Same      |
+   | [[https://docs.python.org/2/library/stdtypes.html#dict.pop][pop]]        | Same      |
+   | [[https://docs.python.org/2/library/stdtypes.html#dict.popitem][popitem]]    | Same      |
+   | [[https://docs.python.org/2/library/stdtypes.html#dict.setdefault][setdefault]] | Same      |
+   | [[https://docs.python.org/2/library/stdtypes.html#dict.update][update]]     | Same      |
+   | [[https://docs.python.org/2/library/stdtypes.html#dict.values][values]]     | Same      |
+
+*** get(key, default=None)
+
+    Having a *get* method on any object ruins the ability to use ~Object.definePropert[y|ies]~ for
+    that method's properties.  To avoid this we renamed it to *Get* with an uppercase *g*.
+
+*** items()
+
+    In Python *items* returns a list of (key, value) tuples.  Since multiple left hand assignments
+    are not yet supported by modern browsers it would be very inefficient to try and use a tuple in
+    the for loop.  Instead the first argument of *items* takes a function which will be called for
+    each item with the key and value as the first and second arguments.  An optional second argument
+    is the scope for the callback function (defaults to dict object).  Here is an example:
+
+    #+BEGIN_SRC javascript
+var d = { city: "Edmonton", region: "Alberta", country: "Canada" };
+d.items(function(key, value) {
+    console.log(key, value);
+});
+// -- Outputs --
+// city, Edmonton
+// region, Alberta
+// country, Canada
+    #+END_SRC
+
+** Data Structures -- [[https://docs.python.org/2/tutorial/datastructures.html][list]]
+
+   | append    | Same |
+   | extend    | Same |
+   | insert    | Same |
+   | remove    | Same |
+   | pop       | Same |
+   | index     | Same |
+   | count     | Same |
+   | sort      | Same |
+   | reverse   | Same |
+   | iterate   | [[#iterate-callback-scope-][New]]  |
+   | enumerate | [[#enumerate-callback-scope-start-][New]]  |
+
+*** iterate( callback, scope )
+
+    Execute *callback* for each item in the list with the item as the first argument.  The
+    *callback* will be called with the given scope or by default the list object.
+
+    #+BEGIN_SRC javascript
+var l = ["Edmonton", "Alberta", "Canada"];
+l.iterate(function(item) {
+    console.log(item);
+});
+// -- Outputs --
+// Edmonton
+// Alberta
+// Canada
+    #+END_SRC
+
+*** enumerate( callback, scope, start )
+
+    Execute *callback* for each item in the list with the item index as the first argument and the
+    item as the second argument.  The *callback* will be called with the given scope or by default
+    the list object.
+
+    #+BEGIN_SRC javascript
+var l = ["Edmonton", "Alberta", "Canada"];
+l.enumerate(function(i, item) {
+    console.log(i, item);
+});
+// -- Outputs --
+// 0 Edmonton
+// 1 Alberta
+// 2 Canada
+    #+END_SRC
+
+  
+** [[https://docs.python.org/2/library/stdtypes.html#string-methods][String Methods]]
+
+   | repeat     | [[#stringrepeatn][New]]             |
+   | [[https://docs.python.org/2/library/stdtypes.html#str.capitalize][capitalize]] | Same            |
+   | [[https://docs.python.org/2/library/stdtypes.html#str.center][center]]     | Same            |
+   | [[https://docs.python.org/2/library/stdtypes.html#str.count][count]]      | Same            |
+   | [[https://docs.python.org/2/library/stdtypes.html#str.decode][decode]]     | Not Implemented |
+   | [[https://docs.python.org/2/library/stdtypes.html#str.encode][encode]]     | Not Implemented |
+   | [[https://docs.python.org/2/library/stdtypes.html#str.endswith][endswith]]   | Same            |
+   | replaceAt  | [[#stringreplaceatindex-str-length][New]]             |
+   | [[https://docs.python.org/2/library/stdtypes.html#str.expandtabs][expandtabs]] | Same            |
+   | [[https://docs.python.org/2/library/stdtypes.html#str.find][find]]       | Same            |
+   | [[https://docs.python.org/2/library/stdtypes.html#str.format][format]]     | Same            |
+   | [[https://docs.python.org/2/library/stdtypes.html#str.index][index]]      | Same            |
+   | [[https://docs.python.org/2/library/stdtypes.html#str.isalnum][isalnum]]    | Same            |
+   | [[https://docs.python.org/2/library/stdtypes.html#str.isalpha][isalpha]]    | Same            |
+   | [[https://docs.python.org/2/library/stdtypes.html#str.isdigit][isdigit]]    | Same            |
+   | [[https://docs.python.org/2/library/stdtypes.html#str.islower][islower]]    | Same            |
+   | [[https://docs.python.org/2/library/stdtypes.html#str.isspace][isspace]]    | Same            |
+   | [[https://docs.python.org/2/library/stdtypes.html#str.istitle][istitle]]    | Not Implemented |
+   | [[https://docs.python.org/2/library/stdtypes.html#str.isupper][isupper]]    | Same            |
+   | [[https://docs.python.org/2/library/stdtypes.html#str.join][join]]       | Same            |
+   | [[https://docs.python.org/2/library/stdtypes.html#str.ljust][ljust]]      | Same            |
+   | [[https://docs.python.org/2/library/stdtypes.html#str.lower][lower]]      | Same            |
+   | [[https://docs.python.org/2/library/stdtypes.html#str.lstrip][lstrip]]     | Same            |
+   | [[https://docs.python.org/2/library/stdtypes.html#str.partition][partition]]  | Same            |
+   | [[https://docs.python.org/2/library/stdtypes.html#str.replace][replace]]    | Same            |
+   | [[https://docs.python.org/2/library/stdtypes.html#str.rfind][rfind]]      | Same            |
+   | [[https://docs.python.org/2/library/stdtypes.html#str.rindex][rindex]]     | Same            |
+   | [[https://docs.python.org/2/library/stdtypes.html#str.rjust][rjust]]      | Same            |
+   | [[https://docs.python.org/2/library/stdtypes.html#str.rpartition][rpartition]] | Same            |
+   | [[https://docs.python.org/2/library/stdtypes.html#str.rsplit][rsplit]]     | Not Implemented |
+   | [[https://docs.python.org/2/library/stdtypes.html#str.rstrip][rstrip]]     | Same            |
+   | [[https://docs.python.org/2/library/stdtypes.html#str.split][split]]      | Same            |
+   | [[https://docs.python.org/2/library/stdtypes.html#str.splitlines][splitlines]] | Same            |
+   | [[https://docs.python.org/2/library/stdtypes.html#str.startswith][startswith]] | Same            |
+   | [[https://docs.python.org/2/library/stdtypes.html#str.strip][strip]]      | Same            |
+   | [[https://docs.python.org/2/library/stdtypes.html#str.swapcase][swapcase]]   | Same            |
+   | [[https://docs.python.org/2/library/stdtypes.html#str.title][title]]      | Same            |
+   | [[https://docs.python.org/2/library/stdtypes.html#str.translate][translate]]  | Not Implemented |
+   | [[https://docs.python.org/2/library/stdtypes.html#str.upper][upper]]      | Same            |
+   | [[https://docs.python.org/2/library/stdtypes.html#str.zfill][zfill]]      | Same            |
+   | [[https://docs.python.org/2/library/stdtypes.html#unicode.isnumeric][isnumeric]]  | Not Implemented |
+   | [[https://docs.python.org/2/library/stdtypes.html#unicode.isdecimal][isdecimal]]  | Not Implemented |
+
+*** string.repeat(n)
+
+    Repeat string *n* number of times.
+
+*** string.replaceAt(index, str, length)
+
+    Replace *length* number of characters starting at character number *index* in *string* with
+    *str*.
+
+    #+BEGIN_SRC javascript
+"Mark Wahlberg".replaceAt( 5, " - " )
+// -- Outputs --
+// Mark - Wahlberg
+
+"Mark Wahlberg".replaceAt( 5, " - ", 8 )
+// -- Outputs --
+// Mark - g
+    #+END_SRC
