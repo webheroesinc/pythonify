@@ -1,0 +1,9 @@
+{
+    "name": "pythonify",
+    "version": "0.1.0",
+    "ignore": [
+        "bower.json",
+        "js/pythonify-tests.js",
+        "python-js.html"
+    ]
+}
