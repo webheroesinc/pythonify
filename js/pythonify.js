@@ -1,9 +1,24 @@
-(function(window) {
 
-    // Object -> Dict
-    // Array -> List
-    // Function
-    // String
+// Pythonify -- Library that implements Python like methods in JavaScript.
+// 
+// Copyright © 2014, Web Heroes Inc.
+//
+// This file is part of Pythonify
+//
+// Pythonify is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+(function(window) {
 
     window.is_complex = function is_complex(obj) {
         return is_dict(obj) || is_list(obj) || is_window(obj) ? true : false;
@@ -55,10 +70,6 @@
         if( is_complex(iter) ) {
             var keys	= iter.keys();
             length	= keys.length;
-            // for( var i in keys ) {
-            //     var key	= keys[i];
-            //     if (iter.hasOwnProperty(key)) length++;
-            // }
         }
         return length || 0;
     }
@@ -106,7 +117,6 @@
     window.list		= list
 
     function dict() {
-        // this checks if the Object is actually a dict like object
         if( arguments.length == 1
             && is_dict( arguments[0] ) ) {
             var d	= {};
@@ -1117,7 +1127,6 @@
         return str.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
     }
     
-    // Object property definitions must be done last
     Object.defineProperties( Object.prototype, {
         "iter": {
             writable: true,
@@ -1267,6 +1276,8 @@
             }
         }
     });
+
+    // Code below is not being used for anything yet...
 
     function utf8_encode(argString) {
         //  discuss at: http://phpjs.org/functions/utf8_encode/
