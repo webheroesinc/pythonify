@@ -1,5 +1,5 @@
 #+TITLE: Pythonify.js
-#+STYLE: <link rel="stylesheet" type="text/css" href="org.css" />
+#+STYLE: <link rel="stylesheet" type="text/css" href="http://cdn.webheroes.ca/org/org.css" />
 
 * Overview
 
@@ -245,7 +245,7 @@ l.enumerate(function(i, item) {
    | [[https://docs.python.org/2/library/stdtypes.html#str.isdigit][isdigit]]    | Same            |
    | [[https://docs.python.org/2/library/stdtypes.html#str.islower][islower]]    | Same            |
    | [[https://docs.python.org/2/library/stdtypes.html#str.isspace][isspace]]    | Same            |
-   | [[https://docs.python.org/2/library/stdtypes.html#str.istitle][istitle]]    | Not Implemented |
+   | [[https://docs.python.org/2/library/stdtypes.html#str.istitle][istitle]]    | Same            |
    | [[https://docs.python.org/2/library/stdtypes.html#str.isupper][isupper]]    | Same            |
    | [[https://docs.python.org/2/library/stdtypes.html#str.join][join]]       | Same            |
    | [[https://docs.python.org/2/library/stdtypes.html#str.ljust][ljust]]      | Same            |
@@ -257,7 +257,7 @@ l.enumerate(function(i, item) {
    | [[https://docs.python.org/2/library/stdtypes.html#str.rindex][rindex]]     | Same            |
    | [[https://docs.python.org/2/library/stdtypes.html#str.rjust][rjust]]      | Same            |
    | [[https://docs.python.org/2/library/stdtypes.html#str.rpartition][rpartition]] | Same            |
-   | [[https://docs.python.org/2/library/stdtypes.html#str.rsplit][rsplit]]     | Not Implemented |
+   | [[https://docs.python.org/2/library/stdtypes.html#str.rsplit][rsplit]]     | Same            |
    | [[https://docs.python.org/2/library/stdtypes.html#str.rstrip][rstrip]]     | Same            |
    | [[https://docs.python.org/2/library/stdtypes.html#str.split][split]]      | Same            |
    | [[https://docs.python.org/2/library/stdtypes.html#str.splitlines][splitlines]] | Same            |

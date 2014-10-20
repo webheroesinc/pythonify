@@ -1,3 +1,4 @@
+
 // Pythonify -- Library that implements Python like methods in JavaScript.
 // 
 // Copyright © 2014, Web Heroes Inc.
@@ -668,6 +669,14 @@
     assert( " \ta".isspace() === false )
     assert( "".isspace() === false )
 
+    // test string.istitle()
+    assert( "They'Re Bill'S Friends.".istitle() === true )
+    assert( "Turn Me Into A Title".istitle() )
+    assert( "Turn1Me1Into1A1Title".istitle() )
+    assert( "they're bill's friends.".istitle() === false )
+    assert( "Turn me into a title".istitle() === false )
+    assert( "turn1me1into1a1title".istitle() === false )
+
     var d = { one: "Hello", two: "World" };
 
     // test string.join()
@@ -716,6 +725,14 @@
     assert( "Hey!".rjust(10, ".") == "......Hey!" )
     assert( "Hey!".rjust(4) == "Hey!" )
 
+    // test string.rsplit()
+    assert( len('10.0.1.15'.rsplit('.')) == 4 )
+    assert( len('10.0.1.15'.rsplit('.', 2)) == 3 )
+    assert( ''.rsplit(' ')[0] == '' )
+    assert( '10.0.1.15'.rsplit('.', 1)[1] == '15' )
+    assert( len(''.rsplit()) == 0 )
+    assert( len('Smack That'.rsplit()) == 2 )
+
     // test string.rstrip()
     assert( '    spacious    '.rstrip() == "    spacious" )
     assert( 'www.example.com'.rstrip('cmowz.') == "www.example" )
@@ -749,7 +766,9 @@
     assert( 'SwApCaSe'.swapcase() == "sWaPcAsE" )
 
     // test string.title()
-    assert( "they're bill's friends.".title() == "They're Bill's Friends." )
+    assert( "they're bill's friends.".title() == "They'Re Bill'S Friends." )
+    assert( "Turn me into a title".title() == "Turn Me Into A Title" )
+    assert( "turn1me1into1a1title".title() == "Turn1Me1Into1A1Title" )
 
     // test string.upper()
     assert( "hey".upper() == "HEY" )

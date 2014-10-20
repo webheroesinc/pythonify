@@ -931,6 +931,12 @@
                 return this.match( /^[\s]+$/ ) ? true : false;
             }
         },
+        "istitle": {
+            writable: true,
+            value: function() {
+                return str(this) === str(this.title());
+            }
+        },
         "join": {
             writable: true,
             value: function( iter ) {
@@ -1035,6 +1041,15 @@
                 return this.replace(re, "");
             }
         },
+        "rsplit": {
+            writable: true,
+            value: function( sep, maxsplit ) {
+                var split = this.split(sep);
+                return maxsplit
+                    ? [ split.slice(0, -maxsplit).join(sep) ].concat(split.slice(-maxsplit))
+                    : split;
+            }
+        },
         "_split": {
             writable: true,
             value: String.prototype.split
@@ -1101,11 +1116,13 @@
         "title": {
             writable: true,
             value: function() {
-                var words	= this.split(' ');
+                var words	= this._split(/[^a-zA-Z]/);
+                var spacers	= this._split(/[a-zA-Z]+/);
+                var str		= spacers[0];
                 for( var i in words ) {
-                    words[i]	= words[i].capitalize();
+                    str		+= words[i].capitalize() + ( spacers[Number(i)+1] || '' );
                 }
-                return words.join(' ');
+                return str;
             }
         },
         "upper": {
