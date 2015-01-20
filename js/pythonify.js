@@ -873,12 +873,12 @@
                     var arg	= arguments[i];
                     if( is_dict(arg) ) {
                         for( var k in arg ) {
-                            var re	= new RegExp( RegExp.escape("{"+k+"}") );
+                            var re	= new RegExp( RegExp.escape("{"+k+"}"), 'g' );
                             str		= str.replace(re, arg[k]);
                         }
                     }
                     else {
-                        var re	= new RegExp( RegExp.escape("{"+i+"}") );
+                        var re	= new RegExp( RegExp.escape("{"+i+"}"), 'g' );
                         str	= str.replace(re, arg);
                     }
                 }

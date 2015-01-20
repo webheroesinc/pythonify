@@ -638,6 +638,7 @@
     assert( "{0} {1}".format("Hello", "World") == "Hello World" )
     assert( "{length} {0} {text} {1}".format("Hello", "World", { length: 4, text: 'Flappy Bird' }) == "4 Hello Flappy Bird World" )
     assert( "{text} {length}".format({ length: 4, text: 'Flappy Bird' }) == "Flappy Bird 4" )
+    assert( "{text} {text}".format({ text: 'Travis' }) == "Travis Travis" )
 
     // test string.isalnum()
     assert( "asldfkj8433".isalnum() === true )
