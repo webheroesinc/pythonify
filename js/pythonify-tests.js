@@ -18,8 +18,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-(function(window) {
-
+(function(window, py) {
     console.log("Running tests...");
 
     passes = 0;
@@ -44,6 +43,19 @@
         assert( error.startswith(expected) === true );
         caught_errors++;
     }
+
+    var d	= {};
+    assert( py(d).update !== undefined );
+    var a	= [];
+    assert( py(a).extend !== undefined );
+    var s	= "";
+    assert( py(s).expandtabs !== undefined );
+    assert( s.expandtabs === undefined );
+    var n	= 1;
+    assert( py(n).in !== undefined );
+    assert( n.in === undefined );
+
+    py.bind();
     
     // Test important functions
 
@@ -70,6 +82,24 @@
     assert( is_dict("string") === false )
     assert( is_dict(23) === false );
     (function() { assert( is_dict(arguments) === false ) })()
+
+    // test is_list()
+    assert( is_list([]) === true );
+    assert( is_list({}) === false );
+
+    // test is_string()
+    assert( is_string("") === true );
+    assert( is_string(new String()) === true );
+    assert( is_string([]) === false );
+    assert( is_string({}) === false );
+
+    // test is_number()
+    assert( is_number(2) === true );
+    assert( is_number(new Number()) === true );
+    assert( is_number("2") === false );
+    assert( is_number("") === false );
+    assert( is_number([]) === false );
+    assert( is_number({}) === false );
 
     // test len() for list and dict
     assert( len(['hello','world']) === 2 )
@@ -882,6 +912,4 @@
     // Super could clone the objects prototype methods into a wrapper and automatically call the
     // same function within that wrapper using the .apply( this, arguments )
 
-    
-
-})(window);
+})(window, py);

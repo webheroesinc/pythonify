@@ -12,3 +12,6 @@ package:
 	echo "  $ git tag v<major>.<minor>.<patch>"
 	echo ""
 	echo "more info: http://bower.io/docs/creating-packages/#maintaining-dependencies"
+
+minify:
+	cd js; uglifyjs -mc -o pythonify.min.js pythonify.js;
