@@ -2,7 +2,7 @@
     "name": "pythonify",
     "description": "JavaScript library that implements most Python built-in functions, string methods, dict methods and list methods.",
     "license": "GPL-3.0",
-    "version": "0.2.1",
+    "version": "0.3.0",
     "ignore": [
         "bower.json",
         "js/pythonify-tests.js",
