@@ -413,6 +413,7 @@
     assert( lts[2][0] === "john" )
 
     // test str()
+    assert( str("") == '' )
     assert( str({a:1,b:2}) == '{"a":1,"b":2}' )
     assert( str([1,2,3,4,5]) == '[1,2,3,4,5]' )
     assert( str(tuple([1,2,3,4,5])) == '(1,2,3,4,5)' )

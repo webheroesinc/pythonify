@@ -1207,6 +1207,12 @@
                 var sign	= this.startswith('-');
                 return (sign ? '-' : '') + this.slice( sign ? 1 : 0 ).rjust( sign ? width-1 : width, '0' );
             }
+        },
+        "__str__": {
+            writable: true,
+            value: function() {
+                return this.substr();
+            }
         }
     };
 
