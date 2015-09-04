@@ -1661,5 +1661,5 @@
     Object.defineProperties( _number.prototype, number_props );
     Object.defineProperties( Function.prototype, function_props );
     
-    window.py		= py;
-})(window);
+    module.exports	= py;
+})(global);

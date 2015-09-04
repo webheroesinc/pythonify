@@ -1,0 +1,18 @@
+{
+  "name": "pythonify",
+  "version": "0.1.4",
+  "description": "",
+  "main": "pythonify.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:webheroesinc/pythonify.git"
+  },
+  "author": "Matthew Brisebois",
+  "license": "GPLv3",
+  "bugs": {
+    "url": "https://github.com/webheroesinc/pythonify/issues"
+  }
+}

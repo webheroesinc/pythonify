@@ -589,8 +589,10 @@
     assert( l[0] == 'single' )
 
     // test list.pop()
-    assert( l.pop() == 'single' )
-    assert( l.pop(1) == 'your' )
+    l.append('testing')
+    assert( l.pop() == 'testing' )
+    assert( l.pop(0) == 'single' )
+    assert( l.pop(1) == 'girls' )
     assert( len(l) == 2 )
 
     // test list.index()
