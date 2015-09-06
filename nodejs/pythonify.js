@@ -44,6 +44,8 @@
     py.is_complex	= is_complex;
 
     var is_window = function (obj) {
+	if (obj === undefined || obj === null)
+	    return false;
         window.asdfghjkl = true;
         var answer	= obj.asdfghjkl === true;
         delete window.asdfghjkl;
@@ -52,6 +54,8 @@
     py.is_window	= is_window;
 
     var is_dict = function (obj) {
+	if (obj === undefined || obj === null)
+	    return false;
         if( obj.callee !== undefined ) {
             return false;
         }
@@ -80,6 +84,8 @@
     py.is_tuple		= is_tuple;
 
     var is_string	= function (str) {
+	if (str === undefined || str === null)
+	    return false;
         String.prototype.tinkerbell	= true;
         var answer	= str.tinkerbell === true;
         delete String.prototype.tinkerbell;
@@ -88,6 +94,8 @@
     py.is_string	= is_string;
 
     var is_number	= function (num) {
+	if (num === undefined || str === null)
+	    return false;
         Number.prototype.tinkerbell	= true;
         var answer	= num.tinkerbell === true;
         delete Number.prototype.tinkerbell;
@@ -96,7 +104,11 @@
     py.is_number	= is_number;
 
     var is_iterable = function (iter) {
-        if( iter.length !== undefined && typeof iter !== 'string' ) {
+	if (iter === undefined || iter === null)
+	    return false;
+	if (is_dict(iter) || is_list(iter) || is_tuple(iter))
+	    return true;
+        if (iter.length !== undefined && typeof iter !== 'string') {
             return true;
         }
         return false;
@@ -342,6 +354,8 @@
     }
     py.int = int;
     function isinstance(obj, classinfo) {
+	if (obj === undefined || obj === null)
+	    return false;
         if( is_window(obj) )
             return false;
         if( obj instanceof classinfo )
@@ -818,18 +832,19 @@
             return iterable[this] !== undefined
                 ? true : false;
         }
-        else if( is_list(iterable) ) {
+        else if( is_list(iterable) || is_tuple(iterable) ) {
             var v = this.anchor !== undefined ? this.toString() : parseInt(this.toString())
             return iterable.indexOf(v) !== -1
                 ? true : false;
         }
+	return false;
     }
     function _notIn(iterable) {
         if( is_dict(iterable) ) {
             return iterable[this] === undefined
                 ? true : false;
         }
-        else if( is_list(iterable) ) {
+        else if( is_list(iterable) || is_tuple(iterable) ) {
             var v = this.anchor !== undefined ? this.toString() : parseInt(this.toString())
             return iterable.indexOf(v) === -1
                 ? true : false;
@@ -1602,7 +1617,6 @@
             return new generator( fn, args );
         }
 
-        console.log(['generator', fn])
         this._fn	= fn;
         var t		= this;
         if( args ) {
@@ -1618,7 +1632,6 @@
         }
     }
     generator.prototype.create = function() {
-        console.log(['create', this._fn])
         return new generator( this._fn, arguments );
     }
     generator.prototype.next = function() {
