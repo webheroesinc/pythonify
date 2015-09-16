@@ -244,7 +244,7 @@
             return String.fromCharCode(i);
         }
         else {
-            throw "ValueError: chr() arg not in range(256)";
+            throw new Error("ValueError: chr() arg not in range(256)");
         }
     }
     py.chr = chr;
@@ -256,7 +256,7 @@
     // py.complex:	mathjs.org does this
     function delattr(obj, name) {
         if( arguments.length !== 2 ) {
-            throw "TypeError: delattr() takes exactly two argument ("+arguments.length+" given)"
+            throw new Error("TypeError: delattr() takes exactly two argument ("+arguments.length+" given)");
         }
         delete obj[name];
     }
@@ -264,7 +264,7 @@
     // py.dir:	Not sure if you can iterate over hidden properties
     function divmod(a,b) {
         if( arguments.length !== 2 ) {
-            throw "TypeError: divmod() takes exactly two argument ("+arguments.length+" given)";
+            throw new Error("TypeError: divmod() takes exactly two argument ("+arguments.length+" given)");
         }
         return [Math.floor(a/b), a % b];
     }
@@ -306,11 +306,11 @@
     py.float = float;
     function getattr(obj, name, dflt) {
         if( arguments.length < 2 ) {
-            throw "TypeError: getattr() takes at least two argument ("+arguments.length+" given)";
+            throw new Error("TypeError: getattr() takes at least two argument ("+arguments.length+" given)");
         }
         if( obj[name] === undefined ) {
             if( dflt === undefined ) {
-                throw "AttributeError: type object '"+(obj.name ? obj.name : obj.constructor.name)+"' has no attribute '"+name+"'";
+                throw new Error("AttributeError: type object '"+(obj.name ? obj.name : obj.constructor.name)+"' has no attribute '"+name+"'");
             }
             else {
                 return dflt;
@@ -325,7 +325,7 @@
     py.globals = globals;
     function hasattr(obj, name) {
         if( arguments.length < 2 ) {
-            throw "TypeError: hasattr() takes at least two argument ("+arguments.length+" given)";
+            throw new Error("TypeError: hasattr() takes at least two argument ("+arguments.length+" given)");
         }
         return obj[name] === undefined ? false : true;
     }
@@ -390,7 +390,7 @@
     // py.long:	??? would be the same as int
     function map(callback) {
         if( len(arguments) < 2 ) {
-            throw "TypeError: map() takes at least two arguments ("+arguments.length+" given)";
+            throw new Error("TypeError: map() takes at least two arguments ("+arguments.length+" given)");
         }
         var iterlist	= [];
         for( var i=1; i < arguments.length; i++ ) {
@@ -485,7 +485,7 @@
             return i.charCodeAt(0);
         }
         else {
-            throw "TypeError: ord() expected a character, but string of length "+i.length+" found";
+            throw new Error("TypeError: ord() expected a character, but string of length "+i.length+" found");
         }
     }
     py.ord = ord;
@@ -495,13 +495,13 @@
     py.pow = pow;
     function range() {
         if( len(arguments) === 0 ) {
-            throw "TypeError: range() takes at least one argument ("+arguments.length+" given)";
+            throw new Error("TypeError: range() takes at least one argument ("+arguments.length+" given)");
         }
         var start	= 0;
         var stop	= undefined;
         var step	= arguments[2] === undefined ? 1 : arguments[2];
         if( step === 0 ) {
-            throw "ValueError: range() step argument must not be zero";
+            throw new Error("ValueError: range() step argument must not be zero");
         }
         if( len(arguments) === 1 ) {
             stop	= arguments[0];
@@ -527,7 +527,7 @@
     // py.print:	??? What to do for print?
     function reduce(callback, iter, initializer) {
         if( len(iter) === 0 && initializer === undefined ) {
-            throw "reduce() of empty sequence with no initial value";
+            throw new Error("reduce() of empty sequence with no initial value");
         }
         var sequence	= is_dict( iter ) ? iter.keys() : iter.copy();
         var accum_value	= initializer === undefined ? sequence.pop() : initializer;
@@ -545,7 +545,7 @@
     py.repr = repr;
     function reversed(iter) {
         if( iter.__reversed__ === undefined ) {
-            throw "TypeError: argument to reversed() must be a sequence";
+            throw new Error("TypeError: argument to reversed() must be a sequence");
         }
         return iter.__reversed__();
     }
@@ -558,7 +558,7 @@
     // py.set:	Later...
     function setattr(obj, name, value) {
         if( arguments.length !== 3 ) {
-            throw "TypeError: setattr() takes exactly three arguments ("+arguments.length+" given)";
+            throw new Error("TypeError: setattr() takes exactly three arguments ("+arguments.length+" given)");
         }
         obj[name] = value;
     }
@@ -566,7 +566,7 @@
     // py.slice:	Seems kinda useless, look into some examples
     function sorted(iter, cmp, key, reverse) {
         if( arguments.length === 0 ) {
-            throw "TypeError: sorted() takes at least one argument (0 given)";
+            throw new Error("TypeError: sorted() takes at least one argument (0 given)");
         }
         // keys is the list we want to return at the end but in the right order
         // if key is defined: sort list of keys made by key function otherwise sort this list directly
@@ -605,24 +605,24 @@
     py.str = str;
     function sum(iter, start) {
         if( arguments.length === 0 )
-            throw "TypeError: sum() takes at least one argument (0 given)";
+            throw new Error("TypeError: sum() takes at least one argument (0 given)");
         if( arguments.length > 2 )
-            throw "TypeError: sum() takes at most two argument ("+arguments.length+" given)";
+            throw new Error("TypeError: sum() takes at most two argument ("+arguments.length+" given)");
         if( start !== undefined && typeof start !== "number" )
-            throw "TypeError: start argument can only be an number";
+            throw new Error("TypeError: start argument can only be an number");
 
         var sequence	= is_dict(iter) ? iter.keys() : iter.copy();
         var total	= reduce(function(x,y) { return x+y }, sequence, start);
 
         if( typeof total == "string" )
-            throw "TypeError: sum() can only handle numbers";
+            throw new Error("TypeError: sum() can only handle numbers");
 
         return total;
     }
     py.sum = sum;
     function Super(classinfo, obj) {
         if( ! isinstance(obj, classinfo) ) {
-            throw "obj must be an instance of classinfo";
+            throw new Error("obj must be an instance of classinfo");
         }
         var parent	= classinfo.prototype.__parent__;
 
@@ -655,7 +655,7 @@
     py.Super = Super;
     function type(obj) {
         if( obj === undefined )
-            throw "TypeError: type() takes exactly one argument ("+arguments.length+" given)";
+            throw new Error("TypeError: type() takes exactly one argument ("+arguments.length+" given)");
         if( is_tuple(obj) ) {
             return "Tuple";
         }
@@ -682,9 +682,9 @@
     py.zip = zip;
     function subclass(classinfo, methods, name) {
         if( arguments.length === 0 )
-            throw "TypeError: subclass() takes at least one argument (0 given)";
+            throw new Error("TypeError: subclass() takes at least one argument (0 given)");
         if( methods !== undefined && methods !== null && ! is_dict(methods) )
-            throw "TypeError: methods must be a dict object";
+            throw new Error("TypeError: methods must be a dict object");
 
         var init_func	=
             "var __tmpclass = function"+(name ? " "+name : "" )+"() {\
@@ -975,7 +975,7 @@
             value: function( sub, start, end ) {
                 var r		= this.find(sub, start, end);
                 if( r === -1 ) {
-                    throw "ValueError";
+                    throw new Error("ValueError");
                 }
                 return r;
             }
@@ -1054,7 +1054,7 @@
             writable: true,
             value: function( sep ) {
                 if( sep === undefined ) {
-                    throw "TypeError: partition() takes exactly one argument ("+arguments.length+" given)";
+                    throw new Error("TypeError: partition() takes exactly one argument ("+arguments.length+" given)");
                 }
                 var index	= this.find(sep);
                 return index
@@ -1094,7 +1094,7 @@
             value: function( sub, start, end ) {
                 var r		= this.rfind(sub, start, end);
                 if( r === -1 ) {
-                    throw "ValueError";
+                    throw new Error("ValueError");
                 }
                 return r;
             }
@@ -1103,7 +1103,7 @@
             writable: true,
             value: function( sep ) {
                 if( sep === undefined ) {
-                    throw "TypeError: partition() takes exactly one argument ("+arguments.length+" given)";
+                    throw new Error("TypeError: partition() takes exactly one argument ("+arguments.length+" given)");
                 }
                 var index	= this.rfind(sep);
                 return index
