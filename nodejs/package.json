@@ -1,6 +1,6 @@
 {
   "name": "pythonify",
-  "version": "0.1.8",
+  "version": "0.2.0",
   "description": "",
   "main": "pythonify.js",
   "scripts": {
@@ -14,5 +14,11 @@
   "license": "GPLv3",
   "bugs": {
     "url": "https://github.com/webheroesinc/pythonify/issues"
+  },
+  "dependencies": {
+    "bunyan": "^1.5.1"
+  },
+  "devDependencies": {
+    "whincutils": "0.0.9"
   }
 }
