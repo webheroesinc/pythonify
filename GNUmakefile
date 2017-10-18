@@ -4,7 +4,9 @@
 
 all:
 	echo   ""
-	echo   "	package		- Create new version for bower package"
+	echo   "	tests		- Run tests"
+	echo   "	minify		- Minify code with uglifyjs"
+	echo   "	package		- Show instructions for making bower package"
 	echo   ""
 
 package:
@@ -15,3 +17,6 @@ package:
 
 minify:
 	cd js; uglifyjs -mc -o pythonify.min.js pythonify.js;
+
+tests:
+	cd nodejs/tests; nodejs pythonify_test.js | bunyan

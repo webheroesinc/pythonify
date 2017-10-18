@@ -1,0 +1,13 @@
+
+* str.expandtabs(tabsize=8)
+  Python docs [[https://docs.python.org/3/library/stdtypes.html#str.expandtabs][str.expandtabs]]
+
+** Usage
+
+   #+BEGIN_SRC javascript
+   const py             = Symbol.for('pythonify');
+ 
+   "Hello\tWorld"[py].expandtabs()      // "Hello   World"
+   "Hello\tWorld"[py].expandtabs(7)     // "Hello  World"
+   "Hello\tWorld"[py].expandtabs(4)     // "Hello   World"
+   #+END_SRC

@@ -1,0 +1,30 @@
+{
+  "name": "pythonify-bind",
+  "version": "0.1.1",
+  "description": "Bind method to object using pythonify symbol",
+  "main": "index.js",
+  "scripts": {
+    "test": "make tests"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/webheroesinc/pythonify.git"
+  },
+  "keywords": [
+    "pythonify",
+    "python",
+    "defineProperty"
+  ],
+  "author": "Matthew Brisebois",
+  "license": "",
+  "bugs": {
+    "url": "https://github.com/webheroesinc/pythonify/issues"
+  },
+  "homepage": "https://github.com/webheroesinc/pythonify#readme",
+  "devDependencies": {
+    "chai": "^4.1.2",
+    "mocha": "^4.0.1"
+  },
+  "dependencies": {
+  }
+}

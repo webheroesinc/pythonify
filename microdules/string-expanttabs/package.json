@@ -1,0 +1,32 @@
+{
+  "name": "@pythonify/string-expandtabs",
+  "version": "0.1.0",
+  "description": "Return a copy of the string where all tab characters are replaced by one or more spaces, depending on the current column and the given tab size.",
+  "main": "index.js",
+  "scripts": {
+    "test": "make tests"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/webheroesinc/pythonify.git"
+  },
+  "keywords": [
+    "pythonify",
+    "python",
+    "string"
+  ],
+  "author": "Matthew Brisebois",
+  "license": "",
+  "bugs": {
+    "url": "https://github.com/webheroesinc/pythonify/issues"
+  },
+  "homepage": "https://github.com/webheroesinc/pythonify#readme",
+  "devDependencies": {
+    "chai": "^4.1.2",
+    "mocha": "^4.0.1"
+  },
+  "dependencies": {
+    "pythonify-bind": "^0.1.1"
+  },
+  "readme": "README.md"
+}

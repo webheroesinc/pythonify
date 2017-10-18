@@ -1,0 +1,13 @@
+
+* str[py].find(sub[, start[, end]])
+  Python docs [[https://docs.python.org/3/library/stdtypes.html#str.find][str.find]]
+
+** Usage
+
+   #+BEGIN_SRC javascript
+   const py             = Symbol.for('pythonify');
+ 
+   "Hello World"[py].find('World')              // 6
+   "Hello World"[py].find('World', 6)           // 0
+   "Hello World"[py].find('World', 6, 7)        // -1
+   #+END_SRC
