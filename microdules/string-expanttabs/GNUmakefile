@@ -2,6 +2,7 @@
 all:
 	echo ""
 	echo "tests		Run the tests"
+	echo "publish		Publish public package to npm"
 	echo ""
 
 tests:
