@@ -11,6 +11,6 @@
    "Hello\tWorld"[py].expandtabs(7)             // "Hello  World"
    "Hello\tWorld"[py].expandtabs(4)             // "Hello   World"
 
-   "\tHello\n\tWorld"[py].expandtabs(4)         // "    Hello\n    World" );
-   "\tHello\t\n\tWorld"[py].expandtabs(4)       // "    Hello   \n    World" );
+   "\tHello\n\tWorld"[py].expandtabs(4)         // "    Hello\n    World"
+   "\tHello\t\n\tWorld"[py].expandtabs(4)       // "    Hello   \n    World"
    #+END_SRC
